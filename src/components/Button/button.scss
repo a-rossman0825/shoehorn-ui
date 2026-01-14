@@ -1,0 +1,11 @@
+.sh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sh-button[aria-disabled='true'],
+.sh-button:disabled {
+  cursor: not-allowed;
+}

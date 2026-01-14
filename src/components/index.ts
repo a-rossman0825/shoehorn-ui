@@ -1,2 +1,1 @@
-// Intentionally empty
-export {}
+export * from './Button'
