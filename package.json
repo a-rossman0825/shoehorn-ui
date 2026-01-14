@@ -3,41 +3,38 @@
   "version": "0.1.0",
   "description": "Design-agnostic Vue 3 component library",
   "type": "module",
-  "license": "MIT", 
-  
+  "license": "MIT",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
-
   "exports": {
-  ".": {
+    ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.umd.js"
     },
     "./style.css": "./dist/style.css"
   },
-  
   "files": [
     "dist"
   ],
-
   "sideEffects": [
     "./dist/style.css"
   ],
-
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "test": "vitest",
     "lint": "eslint ."
   },
-
   "peerDependencies": {
     "vue": "^3.4.0"
   },
-
   "devDependencies": {
-    "vue": "^3.4.0"
+    "@vitejs/plugin-vue": "^6.0.3",
+    "sass": "^1.97.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vue": "^3.5.26"
   }
 }
