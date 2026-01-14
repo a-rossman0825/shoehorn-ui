@@ -8,8 +8,8 @@
     "skipLibCheck": true,
 
     "declaration": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
 
     "outDir": "dist",
     "rootDir": "src",
