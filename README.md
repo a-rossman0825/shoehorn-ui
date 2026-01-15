@@ -23,10 +23,14 @@ It is intended to be used as a **foundation layer**, not a visual design system.
 ## Installation
 
 ```bash
+bash
+
 npm install shoehorn-ui
 ```
 or
 ```bash
+bash
+
 pnpm add shoehorn-ui
 ```
 ---
@@ -36,6 +40,8 @@ pnpm add shoehorn-ui
 #### Global registration (optional)
 
 ```typescript
+typescript
+
 // main.ts
 import { createApp } from 'vue'
 import ShoeHornUI from 'shoehorn-ui'
@@ -47,6 +53,8 @@ createApp(App)
 ```
 #### Individual component imports (recommended for tree-shaking)
 ```typescript
+typescript
+
 import { ShButton } from 'shoehorn-ui'
 ```
 ---
@@ -59,6 +67,8 @@ A foundational button component that preserves native behavior while adding a co
 
 #### Usage
 ```vue
+vue
+
 <template>
   <ShButton @click="onClick">
     Click me
@@ -67,12 +77,16 @@ A foundational button component that preserves native behavior while adding a co
 ```
 #### As an Anchor/Link
 ```vue
+vue
+
 <ShButton as="a" href="/dashboard">
   Go to Dashboard
 </ShButton>
 ```
 #### As a Submit btn
 ```vue
+vue
+
 <form @submit.prevent="onSubmit">
   <Shbutton type="submit">
     Submit form
@@ -103,6 +117,8 @@ No colors, spacing scales, or themes are enforced.
 
 #### Example override:
 ```scss
+scss
+
 .sh-button {
   background: var(--brand-primary);
   border-radius: 6px;
@@ -137,7 +153,7 @@ src/
 
 ---
 
-##️ Build Status
+## Build Status
 This project is under active development.
 APIs may evolve until v1.0.
 
