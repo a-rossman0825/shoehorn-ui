@@ -3,14 +3,20 @@ import { computed, onMounted, useAttrs } from 'vue';
 
 type ButtonAs = 'button' | 'a';
 type ButtonType = 'button' | 'submit' | 'reset';
+type ButtonVariant = 'default' | 'primary' | 'ghost';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 const props = withDefaults(defineProps<{
   as?: ButtonAs
   disabled?: boolean
-type?: ButtonType
+  variant?: ButtonVariant
+  size?: ButtonSize
+  type?: ButtonType
 }>(), {
   as: 'button',
   disabled: false,
+  variant: 'default',
+  size: 'md',
   type: 'button',
 });
 
@@ -60,6 +66,9 @@ onMounted(() => {
   <component 
     :is="as"
     class="sh-button"
+    :data-disabled="disabled || undefined"
+    :data-variant="variant"
+    :data-size="size"
     :type="isButton ? type : undefined"
     :disabled="isButton ? disabled : undefined"
     :aria-disabled="!isButton && disabled ? 'true' : undefined"
@@ -71,4 +80,3 @@ onMounted(() => {
     <slot />
   </component>
 </template>
-
