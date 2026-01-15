@@ -12,15 +12,18 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
       formats: ['es', 'umd']
     },
-
     rollupOptions: {
       // Vue must NOT be bundled
       external: ['vue'],
       output: {
         globals: {
           vue: 'Vue'
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
 })

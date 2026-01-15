@@ -26,6 +26,7 @@
     "build": "vite build",
     "build:types": "tsc -p tsconfig.json",
     "test": "vitest",
+    "test:ui": "vitest --ui",
     "lint": "eslint ."
   },
   "peerDependencies": {
@@ -33,9 +34,13 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.3",
+    "@vitest/ui": "^4.0.17",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^27.4.0",
     "sass": "^1.97.2",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
+    "vitest": "^4.0.17",
     "vue": "^3.5.26"
   }
 }
