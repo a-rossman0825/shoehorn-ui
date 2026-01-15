@@ -32,10 +32,14 @@ All interactive components:
 ShoeHorn UI warns you **during development** when accessibility rules are violated.
 
 Example:
+
 ```txt
+txt
+
 [ShButton] as="a" was used without an href.
 Anchors without href are not accessible.
 ```
+
 These warnings:
 - only appear in dev mode
 - explain _why_ something is wrong

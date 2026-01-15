@@ -6,22 +6,30 @@ It provides behavior, semantics, and accessibility.
 ## Installation
 
 ```bash
+bash
+
 npm install shoehorn-ui
 ```
 #### peer dependencies
 ShoeHorn UI requires:
 - Vue 3 (Composition API)
 ```bash
+bash
+
 npm install vue@^3
 ```
 ---
 ## Usage
 #### Import components
 ```ts
+typescript
+
 import { ShButton } from 'shoehorn-ui';
 ```
 #### Use in templates
 ```vue
+vue
+
 <template>
   <ShButton @click="onClick">
     Click Me
@@ -34,6 +42,8 @@ import { ShButton } from 'shoehorn-ui';
 
 You may register all components globally:
 ```ts
+typescript
+
 import { createApp } from 'vue';
 import ShoeHornUI from 'shoehorn-ui';
 
@@ -42,6 +52,7 @@ createApp(App)
   .mount('#app')
 ```
 This is completely optional, tree-shaking works better with direct imports.
+
 ---
 ## Philosophy
 - No forced styles

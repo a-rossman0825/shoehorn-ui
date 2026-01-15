@@ -15,6 +15,8 @@ Each component provides:
 
 Example:
 ```html
+html
+
 <button
   class="sh-button"
   data-variant="primary"
@@ -22,10 +24,13 @@ Example:
   data-disabled="true"
 >
 ```
+
 ---
 
 ## Styling with CSS/SCSS
 ```scss
+scss
+
 .sh-button {
   font: inherit;
   padding: 0.5rem 1rem;
@@ -41,6 +46,7 @@ Example:
 }
 
 ---
+
 ## Why data attributes?
 - No class overuse/confusion
 - Easy to inspect in DevTools
@@ -53,7 +59,10 @@ Example:
 ## Theming & dark mode
 
 ShoeHorn UI works well with CSS variables:
+
 ```css
+css
+
 :root {
   --brand-primary: #2563eb;
 }
@@ -62,6 +71,7 @@ ShoeHorn UI works well with CSS variables:
   --brand-primary: #60a5fa;
 }
 ```
+
 You control:
 - light/dark modes
 - branding

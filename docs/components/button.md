@@ -6,23 +6,31 @@ An accessible, polymorphic button component.
 
 ## Basic usage
 ```vue
+vue
+
 <ShButton @click="save">
   Save
 </ShButton>
 ```
 Renders:
 ```html
+html
+
 <button class="sh-button">Save</button>
 ```
 
 ## Rendering as a link
 ```vue
+vue
+
 <ShButton as="a" href="/settings">
   Go To Settings
 </ShButton>
 ```
 Renders:
 ```html
+html
+
 <a class="sh-button" href="/settings">Go to settings</a>
 ```
 ⚠️ Note: Using as="a" without href will trigger a dev warning.
@@ -32,28 +40,28 @@ Renders:
 ## Props
 | **Prop** | **Type** | **Default** | **Description** |
 | -------- | -------- | ----------- | --------------- |
-| as       | 'button' &#124; 'a' | button | Render element |
-| disabled | boolean  | false       | Disables interaction |
-| variant  | 'default' &#124; 'primary' &#124; 'ghost' | default | Semantic variants |
-| size     | 'sm' &#124; 'md' &#124; 'lg' | md | Size hint |
+| `as`       | 'button' &#124; 'a' | button | Render element |
+| `disabled` | boolean  | false       | Disables interaction |
+| `variant`  | 'default' &#124; 'primary' &#124; 'ghost' | default | Semantic variants |
+| `size`     | 'sm' &#124; 'md' &#124; 'lg' | md | Size hint |
 
 ---
 
 ## Events
 | **Event** | **Payload** | **Description** |
 | --------- | ----------- | --------------- |
-| click     | MouseEvent  | Emitted when activated |
+| `click`     | MouseEvent  | Emitted when activated |
 
-| Disabled buttons do not emit events.
+| `disabled` buttons do not emit events.
 
 ___
 
 ## Accessibility behavior
-- uses native <button> semantics when possible
+- uses native `<button>` semantics when possible
 - Anchors receive:
-	- role="button"
-	- aria-disabled
-	- keyboard activation (Enter/Space)
+	- `role="button"`
+	- `aria-disabled`
+	- keyboard activation (`Enter`/`Space`)
 - Disabled anchors are removed from tab order
 
 ___
@@ -61,16 +69,20 @@ ___
 ## Styling hooks
 
 #### Classes
-- .sh-button
+- `.sh-button`
 
 #### Data attributes
 ```html
-data-variant="defualt | primary | ghost"
+html
+
+data-variant="default | primary | ghost"
 data-size="sm | md | lg"
 data-disabled="true"
 ```
 Example:
 ```scss
+scss
+
 .sh-button[data-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
