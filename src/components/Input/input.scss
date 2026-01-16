@@ -1,0 +1,40 @@
+@use '@/styles/focus' as *;
+
+/* Layout & disp */
+.sh-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Hit target & readability */ 
+.sh-input__control {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  border: 1px solid currentColor;
+}
+
+/* Disabled state */
+.sh-input__control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sh-input__control:focus-visible {
+  @include sh-focus-ring;
+}
+
+/* Error state (visual + ARIA) */
+.sh-input[data-state="invalid"] .sh-input__control {
+  border-color: red;
+}
+
+/* Label spacing */
+.sh-input__label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
