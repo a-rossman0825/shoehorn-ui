@@ -1,6 +1,6 @@
 # ShoeHorn UI
 
-**ShoeHorn UI** is an accessibility-first, desgin-agnostic component library for Vue 3 + TypeScript.
+**ShoeHorn UI** is an accessibility-first, design-agnostic component library for Vue 3 + TypeScript.
 
 Features:
 - Correct semantics
@@ -53,14 +53,35 @@ import { ShButton } from 'shoehorn-ui';
 Full documentation lives in the /docs folder:
 - [Getting Started](./docs/getting-started.md)
 - [Styling Guide](./docs/styling.md)
-- [Accessiblity](./docs/accessibility.md)
+- [Accessibility](./docs/accessibility.md)
 - Components
-	- [ShButton](./docs/components/button.md)
+	- [ShAccordion](./docs/components/accordion.md)
+  - [ShBadge](./docs/components/badge.md)
+  - [ShBreadcrumbs](./docs/components/breadcrumbs.md)
+  - [ShButton](./docs/components/button.md)
+  - [ShCard](./docs/components/card.md)
+  - [ShCheckbox](./docs/components/checkbox.md)
+  - [ShCombobox](./docs/components/combobox.md)
+  - [ShDialog](./docs/components/dialog.md)
+  - [ShField](./docs/components/field.md)
+  - [ShForm](./docs/components/form.md)
+  - [ShInput](./docs/components/input.md)
+  - [ShLabel](./docs/components/label.md)
+  - [ShPagination](./docs/components/pagination.md)
+  - [ShProgress](./docs/components/progress.md)
+  - [ShRadiogroup](./docs/components/radiogroup.md)
+  - [ShSelect](./docs/components/select.md)
+  - [ShSpinner](./docs/components/spinner.md)
+  - [ShSwitch](./docs/components/switch.md)
+  - [ShTabs](./docs/components/tabs.md)
+  - [ShTextarea](./docs/components/textarea.md)
+  - [ShTooltip](./docs/components/tooltip.md)
+
 
 ---
 
 # Philosophy
-- Accessiblity as a Feature
+- Accessibility as a Feature
 - Native HTML first
 - No Fake ARIA
 - No forced styles
@@ -71,7 +92,7 @@ Full documentation lives in the /docs folder:
 # Build Status
 ShoeHorn UI is currently in early development.
 - APIs will evolve
-- Components are being added incrememntally
+- Components are being added incrementally
 - Accessibility guarantees are still completely stable
 
 ---

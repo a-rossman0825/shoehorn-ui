@@ -1,8 +1,26 @@
-@use './variables';
-@use './base';
-@use './focus';
-@use './states';
-@use './controls';
+@use "./variables";
+@use "./base";
+@use "./focus";
 
-@use '../input/input';
-@use '../button/button';
+// Component styles
+@use "../components/Button/button";
+@use "../components/Input/input";
+@use "../components/Checkbox/checkbox";
+@use "../components/RadioGroup/radiogroup";
+@use "../components/Select/select";
+@use "../components/Switch/switch";
+@use "../components/Textarea/textarea";
+@use "../components/Label/label";
+@use "../components/Badge/badge";
+@use "../components/Card/card";
+@use "../components/Progress/progress";
+@use "../components/Spinner/spinner";
+@use "../components/Dialog/dialog";
+@use "../components/Tooltip/tooltip";
+@use "../components/Tabs/tabs";
+@use "../components/Accordion/accordion";
+@use "../components/Breadcrumbs/breadcrumbs";
+@use "../components/Pagination/pagination";
+@use "../components/Form/form";
+@use "../components/Field/field";
+@use "../components/Combobox/combobox";

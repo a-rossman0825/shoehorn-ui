@@ -1,3 +1,5 @@
+@use "../../styles/focus" as *;
+
 // ShBreadcrumbs styles
 .sh-breadcrumbs {
   font-size: 0.875rem;
@@ -28,7 +30,7 @@
   }
 
   &:focus-visible {
-    @extend %focus-ring;
+    @include sh-focus-ring;
   }
 }
 

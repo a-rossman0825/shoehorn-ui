@@ -1,3 +1,5 @@
+@use "../../styles/focus" as *;
+
 // ShRadioGroup styles
 .sh-radio-group {
   display: flex;
@@ -38,7 +40,7 @@
   }
 
   &:focus-visible {
-    @extend %focus-ring;
+    @include sh-focus-ring;
   }
 }
 

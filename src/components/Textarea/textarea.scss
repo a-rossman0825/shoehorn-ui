@@ -1,3 +1,5 @@
+@use "../../styles/focus" as *;
+
 // ShTextarea styles
 .sh-textarea {
   display: flex;
@@ -24,7 +26,7 @@
   }
 
   &:focus-visible {
-    @extend %focus-ring;
+    @include sh-focus-ring;
   }
 
   &[data-state="invalid"] {

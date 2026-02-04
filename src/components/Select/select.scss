@@ -1,3 +1,5 @@
+@use "../../styles/focus" as *;
+
 // ShSelect styles
 .sh-select {
   display: flex;
@@ -23,7 +25,7 @@
   }
 
   &:focus-visible {
-    @extend %focus-ring;
+    @include sh-focus-ring;
   }
 
   &[data-state="invalid"] {

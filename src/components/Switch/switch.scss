@@ -1,3 +1,5 @@
+@use "../../styles/focus" as *;
+
 // ShSwitch styles
 .sh-switch {
   display: inline-flex;
@@ -25,7 +27,7 @@
   }
 
   &:focus-visible {
-    @extend %focus-ring;
+    @include sh-focus-ring;
   }
 }
 
