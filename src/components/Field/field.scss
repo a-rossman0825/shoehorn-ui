@@ -1,0 +1,44 @@
+// ShField styles
+.sh-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sh-field__label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sh-field__label {
+  font-weight: 500;
+  color: var(--color-text, #111827);
+  font-size: 0.875rem;
+}
+
+.sh-field__required,
+.sh-field__optional {
+  font-size: 0.75rem;
+  color: var(--color-text-subtle, #6b7280);
+}
+
+.sh-field__required {
+  color: var(--color-error, #ef4444);
+}
+
+.sh-field__description {
+  font-size: 0.875rem;
+  color: var(--color-text-subtle, #6b7280);
+  margin: 0;
+}
+
+.sh-field__error {
+  font-size: 0.875rem;
+  color: var(--color-error, #ef4444);
+  margin: 0;
+}
+
+.sh-field__control {
+  // Container for the input/control element
+}

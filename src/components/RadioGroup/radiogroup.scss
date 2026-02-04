@@ -1,0 +1,53 @@
+// ShRadioGroup styles
+.sh-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sh-radio-group__label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.sh-radio-group__options {
+  display: flex;
+  gap: 1rem;
+
+  &[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  &[data-orientation="horizontal"] {
+    flex-direction: row;
+  }
+}
+
+.sh-radio-group__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sh-radio-group__input {
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    @extend %focus-ring;
+  }
+}
+
+.sh-radio-group__option-label {
+  cursor: pointer;
+  user-select: none;
+
+  input:disabled + & {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

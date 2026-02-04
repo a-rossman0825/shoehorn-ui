@@ -177,20 +177,141 @@ describe("ShInput", () => {
     warn.mockRestore();
   });
 
-  it("does not warn about aria-describedby when error is set (handled automatically)", () => {
+  it("warns when required but label has no visual indicator", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     mount(ShInput, {
       props: {
-        label: "Test Input",
-        error: "Something went wrong",
+        label: "Email",
+        required: true,
+      },
+    });
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("required but label doesn't indicate"),
+    );
+
+    warn.mockRestore();
+  });
+
+  it("does not warn when label includes required indicator", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mount(ShInput, {
+      props: {
+        label: "Email *",
+        required: true,
       },
     });
 
     expect(warn).not.toHaveBeenCalledWith(
-      expect.stringContaining("aria-describedby")
+      expect.stringContaining("required but label doesn't indicate"),
     );
 
     warn.mockRestore();
+  });
+
+  it("warns when email type lacks autocomplete", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    mount(ShInput, {
+      props: {
+        label: "Email",
+        type: "email",
+      },
+    });
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("autocomplete"));
+
+    warn.mockRestore();
+  });
+
+  // -------------------------
+  // Form attributes
+  // -------------------------
+
+  it("applies name attribute", () => {
+    const wrapper = mount(ShInput, {
+      props: {
+        name: "email-field",
+      },
+    });
+
+    expect(wrapper.find("input").attributes("name")).toBe("email-field");
+  });
+
+  it("applies placeholder", () => {
+    const wrapper = mount(ShInput, {
+      props: {
+        placeholder: "Enter your email",
+      },
+    });
+
+    expect(wrapper.find("input").attributes("placeholder")).toBe(
+      "Enter your email",
+    );
+  });
+
+  it("applies minlength and maxlength", () => {
+    const wrapper = mount(ShInput, {
+      props: {
+        minlength: 3,
+        maxlength: 20,
+      },
+    });
+
+    const input = wrapper.find("input");
+    expect(input.attributes("minlength")).toBe("3");
+    expect(input.attributes("maxlength")).toBe("20");
+  });
+
+  it("applies pattern attribute", () => {
+    const wrapper = mount(ShInput, {
+      props: {
+        pattern: "[0-9]{3}-[0-9]{4}",
+      },
+    });
+
+    expect(wrapper.find("input").attributes("pattern")).toBe(
+      "[0-9]{3}-[0-9]{4}",
+    );
+  });
+
+  it("applies autocomplete attribute", () => {
+    const wrapper = mount(ShInput, {
+      props: {
+        autocomplete: "email",
+      },
+    });
+
+    expect(wrapper.find("input").attributes("autocomplete")).toBe("email");
+  });
+
+  // -------------------------
+  // Exposed methods
+  // -------------------------
+
+  it("exposes focus method", async () => {
+    const wrapper = mount(ShInput);
+    const vm = wrapper.vm as any;
+
+    expect(vm.focus).toBeDefined();
+    expect(typeof vm.focus).toBe("function");
+  });
+
+  it("exposes blur method", async () => {
+    const wrapper = mount(ShInput);
+    const vm = wrapper.vm as any;
+
+    expect(vm.blur).toBeDefined();
+    expect(typeof vm.blur).toBe("function");
+  });
+
+  it("exposes select method", async () => {
+    const wrapper = mount(ShInput);
+    const vm = wrapper.vm as any;
+
+    expect(vm.select).toBeDefined();
+    expect(typeof vm.select).toBe("function");
   });
 });

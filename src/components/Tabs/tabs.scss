@@ -1,0 +1,51 @@
+// ShTabs styles
+.sh-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-tabs__list {
+  display: flex;
+  border-bottom: 2px solid var(--color-border, #e5e7eb);
+  gap: 0.5rem;
+
+  &[data-orientation="vertical"] {
+    flex-direction: column;
+    border-bottom: none;
+    border-right: 2px solid var(--color-border, #e5e7eb);
+  }
+}
+
+.sh-tabs__tab {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+
+  &[aria-selected="true"] {
+    color: var(--color-primary, #3b82f6);
+    border-bottom-color: var(--color-primary, #3b82f6);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @extend %focus-ring;
+  }
+}
+
+.sh-tabs__panel {
+  padding: 1rem 0;
+
+  &:focus {
+    outline: none;
+  }
+}

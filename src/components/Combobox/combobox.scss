@@ -1,0 +1,116 @@
+// ShCombobox styles
+.sh-combobox {
+  position: relative;
+  width: 100%;
+}
+
+.sh-combobox__wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sh-combobox__input {
+  width: 100%;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 0.375rem;
+  background: var(--color-bg, #ffffff);
+  color: var(--color-text, #111827);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &::placeholder {
+    color: var(--color-text-placeholder, #9ca3af);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-border-hover, #9ca3af);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary, #3b82f6);
+    box-shadow: 0 0 0 3px var(--color-focus-ring, rgba(59, 130, 246, 0.1));
+  }
+
+  &:disabled {
+    background: var(--color-bg-disabled, #f3f4f6);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--color-error, #ef4444);
+  }
+}
+
+.sh-combobox__icon {
+  position: absolute;
+  right: 0.75rem;
+  pointer-events: none;
+  color: var(--color-text-subtle, #6b7280);
+  transition: transform 0.2s;
+
+  &--open {
+    transform: rotate(180deg);
+  }
+}
+
+.sh-combobox__listbox {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 0.375rem;
+  background: var(--color-bg, #ffffff);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+}
+
+.sh-combobox__option {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover:not(&--disabled):not(&--empty) {
+    background: var(--color-bg-hover, #f3f4f6);
+  }
+
+  &--active:not(&--disabled):not(&--empty) {
+    background: var(--color-bg-hover, #f3f4f6);
+  }
+
+  &--selected {
+    background: var(--color-primary-subtle, #dbeafe);
+    font-weight: 600;
+
+    &:hover {
+      background: var(--color-primary-subtle-hover, #bfdbfe);
+    }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--empty {
+    color: var(--color-text-subtle, #6b7280);
+    font-style: italic;
+    cursor: default;
+  }
+}

@@ -1,0 +1,43 @@
+// ShBreadcrumbs styles
+.sh-breadcrumbs {
+  font-size: 0.875rem;
+}
+
+.sh-breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sh-breadcrumbs__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sh-breadcrumbs__link {
+  color: var(--color-link, #3b82f6);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    @extend %focus-ring;
+  }
+}
+
+.sh-breadcrumbs__current {
+  color: var(--color-text, #111827);
+  font-weight: 500;
+}
+
+.sh-breadcrumbs__separator {
+  color: var(--color-text-subtle, #6b7280);
+  user-select: none;
+}

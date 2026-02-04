@@ -1,0 +1,10 @@
+// ShCard styles
+.sh-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background-color: var(--color-bg, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}

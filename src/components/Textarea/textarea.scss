@@ -1,0 +1,59 @@
+// ShTextarea styles
+.sh-textarea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sh-textarea__label {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.sh-textarea__control {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.5;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    @extend %focus-ring;
+  }
+
+  &[data-state="invalid"] {
+    border-color: var(--color-error, #dc2626);
+  }
+
+  &[data-resize="none"] {
+    resize: none;
+  }
+
+  &[data-resize="both"] {
+    resize: both;
+  }
+
+  &[data-resize="horizontal"] {
+    resize: horizontal;
+  }
+
+  &[data-resize="vertical"] {
+    resize: vertical;
+  }
+}
+
+.sh-textarea__description {
+  font-size: 0.875rem;
+  color: var(--color-text-subtle, #6b7280);
+}
+
+.sh-textarea__error {
+  font-size: 0.875rem;
+  color: var(--color-error, #dc2626);
+}

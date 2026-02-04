@@ -1,0 +1,29 @@
+// ShCheckbox styles
+.sh-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sh-checkbox__input {
+  cursor: pointer;
+
+  &[data-state="disabled"] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:focus-visible {
+    @extend %focus-ring;
+  }
+}
+
+.sh-checkbox__label {
+  cursor: pointer;
+  user-select: none;
+
+  input[disabled] + & {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

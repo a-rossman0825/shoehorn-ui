@@ -1,0 +1,13 @@
+// ShLabel styles
+.sh-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+}
+
+.sh-label__required {
+  color: var(--color-error, #dc2626);
+  margin-left: 0.25rem;
+}

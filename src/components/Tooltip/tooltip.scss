@@ -1,0 +1,36 @@
+// ShTooltip styles
+.sh-tooltip-wrapper {
+  display: inline-block;
+}
+
+.sh-tooltip {
+  position: fixed;
+  z-index: 50;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-bg-inverse, #1f2937);
+  color: var(--color-text-inverse, white);
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  pointer-events: none;
+  white-space: nowrap;
+
+  &[data-placement="top"] {
+    bottom: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  &[data-placement="bottom"] {
+    top: 100%;
+    margin-top: 0.5rem;
+  }
+
+  &[data-placement="left"] {
+    right: 100%;
+    margin-right: 0.5rem;
+  }
+
+  &[data-placement="right"] {
+    left: 100%;
+    margin-left: 0.5rem;
+  }
+}
