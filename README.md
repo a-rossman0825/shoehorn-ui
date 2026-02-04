@@ -3,6 +3,7 @@
 **ShoeHorn UI** is an accessibility-first, design-agnostic component library for Vue 3 + TypeScript.
 
 Features:
+
 - Correct semantics
 - Keyboard interaction
 - ARIA only where appropriate
@@ -36,13 +37,11 @@ npm install vue@^3
 vue
 
 <script setup lang="ts">
-import { ShButton } from 'shoehorn-ui';
+import { ShButton } from "shoehorn-ui";
 </script>
 
 <template>
-  <ShButton @click="save">
-    Save changes
-  </ShButton>
+  <ShButton @click="save"> Save changes </ShButton>
 </template>
 ```
 
@@ -50,37 +49,38 @@ import { ShButton } from 'shoehorn-ui';
 
 # Documentation
 
-Full documentation lives in the /docs folder:
-- [Getting Started](./docs/getting-started.md)
-- [Styling Guide](./docs/styling.md)
-- [Accessibility](./docs/accessibility.md)
-- Components
-	- [ShAccordion](./docs/components/accordion.md)
-  - [ShBadge](./docs/components/badge.md)
-  - [ShBreadcrumbs](./docs/components/breadcrumbs.md)
-  - [ShButton](./docs/components/button.md)
-  - [ShCard](./docs/components/card.md)
-  - [ShCheckbox](./docs/components/checkbox.md)
-  - [ShCombobox](./docs/components/combobox.md)
-  - [ShDialog](./docs/components/dialog.md)
-  - [ShField](./docs/components/field.md)
-  - [ShForm](./docs/components/form.md)
-  - [ShInput](./docs/components/input.md)
-  - [ShLabel](./docs/components/label.md)
-  - [ShPagination](./docs/components/pagination.md)
-  - [ShProgress](./docs/components/progress.md)
-  - [ShRadiogroup](./docs/components/radiogroup.md)
-  - [ShSelect](./docs/components/select.md)
-  - [ShSpinner](./docs/components/spinner.md)
-  - [ShSwitch](./docs/components/switch.md)
-  - [ShTabs](./docs/components/tabs.md)
-  - [ShTextarea](./docs/components/textarea.md)
-  - [ShTooltip](./docs/components/tooltip.md)
+Full documentation lives in the [/docs folder](https://github.com/a-rossman0825/shoehorn-ui/tree/main/docs):
 
+- [Getting Started](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/getting-started.md)
+- [Styling Guide](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/styling.md)
+- [Accessibility](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/accessibility.md)
+- Components
+  - [ShAccordion](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/accordion.md)
+  - [ShBadge](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/badge.md)
+  - [ShBreadcrumbs](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/breadcrumbs.md)
+  - [ShButton](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/button.md)
+  - [ShCard](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/card.md)
+  - [ShCheckbox](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/checkbox.md)
+  - [ShCombobox](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/combobox.md)
+  - [ShDialog](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/dialog.md)
+  - [ShField](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/field.md)
+  - [ShForm](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/form.md)
+  - [ShInput](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/input.md)
+  - [ShLabel](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/label.md)
+  - [ShPagination](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/pagination.md)
+  - [ShProgress](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/progress.md)
+  - [ShRadiogroup](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/radiogroup.md)
+  - [ShSelect](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/select.md)
+  - [ShSpinner](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/spinner.md)
+  - [ShSwitch](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/switch.md)
+  - [ShTabs](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/tabs.md)
+  - [ShTextarea](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/textarea.md)
+  - [ShTooltip](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/tooltip.md)
 
 ---
 
 # Philosophy
+
 - Accessibility as a Feature
 - Native HTML first
 - No Fake ARIA
@@ -90,7 +90,9 @@ Full documentation lives in the /docs folder:
 ---
 
 # Build Status
+
 ShoeHorn UI is currently in early development.
+
 - APIs will evolve
 - Components are being added incrementally
 - Accessibility guarantees are still completely stable
@@ -102,4 +104,3 @@ ShoeHorn UI is currently in early development.
 MIT
 
 Free software, Hell Yeah!
-
