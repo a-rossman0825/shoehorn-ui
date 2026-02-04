@@ -34,7 +34,7 @@ const describedById = computed(() => {
 
 onMounted(() => {
   if (import.meta.env.DEV) {
-    if (!props.label && !slots.label) {
+    if (!props.label && !('label' in slots)) {
       console.warn(
         "[ShField] Field has no label. " +
           "Provide the `label` prop or use the label slot for accessibility.",

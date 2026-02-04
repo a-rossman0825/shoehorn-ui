@@ -1,10 +1,12 @@
 <script setup lang="ts">
-(defineProps<{
-  as?: "div" | "article" | "section";
-}>(),
+withDefaults(
+  defineProps<{
+    as?: "div" | "article" | "section";
+  }>(),
   {
     as: "div",
-  });
+  },
+);
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { computed, onMounted, useAttrs } from "vue";
 const props = withDefaults(
   defineProps<{
     for?: string;
+    htmlFor?: string;
     required?: boolean;
   }>(),
   {
@@ -11,11 +12,13 @@ const props = withDefaults(
   },
 );
 
+const forValue = computed(() => props.htmlFor || props.for);
+
 const attrs = useAttrs();
 
 onMounted(() => {
   if (import.meta.env.DEV) {
-    if (!props.for && !attrs["aria-label"]) {
+    if (!forValue.value && !attrs["aria-label"]) {
       console.warn(
         "[ShLabel] Label should have a `for` attribute to associate with a form control. " +
           "Provide the `for` prop with the ID of the associated element.",
@@ -26,7 +29,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <label class="sh-label" :for="for" :data-required="required || undefined">
+  <label class="sh-label" :for="forValue" :data-required="required || undefined">
     <slot />
     <span v-if="required" class="sh-label__required" aria-label="required"
       >*</span
