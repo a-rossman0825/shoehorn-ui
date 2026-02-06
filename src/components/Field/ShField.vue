@@ -33,7 +33,7 @@ const describedById = computed(() => {
 });
 
 onMounted(() => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV !== 'production') {
     if (!props.label && !('label' in slots)) {
       console.warn(
         "[ShField] Field has no label. " +

@@ -17,7 +17,7 @@ const forValue = computed(() => props.htmlFor || props.for);
 const attrs = useAttrs();
 
 onMounted(() => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV !== 'production') {
     if (!forValue.value && !attrs["aria-label"]) {
       console.warn(
         "[ShLabel] Label should have a `for` attribute to associate with a form control. " +

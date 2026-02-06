@@ -39,7 +39,7 @@ onUnmounted(() => {
 });
 
 onMounted(() => {
-  if (import.meta.env.DEV && !props.content) {
+  if (process.env.NODE_ENV !== 'production' && !props.content) {
     console.warn(
       "[ShTooltip] Tooltip has no content. Provide the `content` prop.",
     );

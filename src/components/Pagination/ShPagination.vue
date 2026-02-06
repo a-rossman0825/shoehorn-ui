@@ -60,7 +60,7 @@ const goToPage = (page: number) => {
 };
 
 onMounted(() => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV !== 'production') {
     if (props.modelValue < 1 || props.modelValue > totalPages.value) {
       console.warn(
         "[ShPagination] Current page is out of bounds. " +

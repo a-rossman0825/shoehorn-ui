@@ -101,7 +101,7 @@ watch(
 );
 
 onMounted(() => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV !== 'production') {
     if (!props.title) {
       console.warn(
         "[ShDialog] Dialog has no title. " +

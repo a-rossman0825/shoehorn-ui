@@ -26,7 +26,7 @@ const valueText = computed(() => {
 });
 
 onMounted(() => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV !== 'production') {
     const hasLabel =
       !!props.label ||
       attrs["aria-label"] !== undefined ||
