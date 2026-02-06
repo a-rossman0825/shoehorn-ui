@@ -17,7 +17,7 @@ const forValue = computed(() => props.htmlFor || props.for);
 const attrs = useAttrs();
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     if (!forValue.value && !attrs["aria-label"]) {
       console.warn(
         "[ShLabel] Label should have a `for` attribute to associate with a form control. " +
@@ -29,7 +29,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <label class="sh-label" :for="forValue" :data-required="required || undefined">
+  <label
+    class="sh-label"
+    :for="forValue"
+    :data-required="required || undefined"
+  >
     <slot />
     <span v-if="required" class="sh-label__required" aria-label="required"
       >*</span

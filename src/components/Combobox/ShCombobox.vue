@@ -145,7 +145,7 @@ const blur = () => inputRef.value?.blur();
 defineExpose({ focus, blur });
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     if (props.options.length === 0) {
       console.warn(
         "[ShCombobox] Combobox has no options. " +

@@ -54,7 +54,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     const attrs = useAttrs() as Record<string, unknown>;
     const slots = useSlots();
 

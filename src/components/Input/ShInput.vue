@@ -98,7 +98,7 @@ function onBlur(event: FocusEvent) {
 }
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     const aria = getAriaAttrs();
     const hasLabel =
       !!props.label ||

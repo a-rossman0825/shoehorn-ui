@@ -18,7 +18,7 @@ const props = withDefaults(
 );
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     if (!props.items || props.items.length === 0) {
       console.warn(
         "[ShBreadcrumbs] Breadcrumbs has no items. " +

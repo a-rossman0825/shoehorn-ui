@@ -21,7 +21,7 @@ const displayCount = computed(() => {
 });
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     const hasLabel = attrs["aria-label"] || attrs["aria-labelledby"];
     const hasCount = props.count !== undefined;
 

@@ -33,8 +33,8 @@ const describedById = computed(() => {
 });
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
-    if (!props.label && !('label' in slots)) {
+  if (process.env.NODE_ENV !== "production") {
+    if (!props.label && !("label" in slots)) {
       console.warn(
         "[ShField] Field has no label. " +
           "Provide the `label` prop or use the label slot for accessibility.",

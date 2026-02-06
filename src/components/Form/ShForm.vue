@@ -24,7 +24,7 @@ const handleSubmit = (event: Event) => {
 };
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     const form = event?.target as HTMLFormElement;
     if (form) {
       const inputs = form.querySelectorAll("[required]");
