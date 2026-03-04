@@ -149,7 +149,6 @@ function handleBlur(event: FocusEvent) {
 }
 
 defineExpose({ focus, blur });
-defineExpose({ focus, blur });
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
