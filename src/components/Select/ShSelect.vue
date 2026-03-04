@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useAttrs } from "vue";
+import { useFocus } from "../../composables/"
 
 interface SelectOption {
   value: string;
@@ -34,7 +35,7 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const selectRef = ref<HTMLSelectElement>();
+const { elementRef, focus, blur, onFocus, onBlur } = useFocus<HTMLSelectElement>();
 
 const selectId = computed(() => {
   return props.id ?? `sh-select-${Math.random().toString(36).slice(2)}`;
@@ -71,18 +72,17 @@ function onChange(event: Event) {
   emit("change", target.value, event);
 }
 
-function onFocus(event: FocusEvent) {
+defineExpose({ focus, blur });
+
+function handleFocus(event: FocusEvent) {
+  onFocus();
   emit("focus", event);
 }
 
-function onBlur(event: FocusEvent) {
+function handleBlur(event: FocusEvent){
+  onBlur();
   emit("blur", event);
 }
-
-defineExpose({
-  focus: () => selectRef.value?.focus(),
-  blur: () => selectRef.value?.blur(),
-});
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
@@ -128,7 +128,7 @@ onMounted(() => {
 
     <select
       :id="selectId"
-      ref="selectRef"
+      ref="elementRef"
       class="sh-select__control"
       :name="name"
       :value="modelValue"
@@ -140,8 +140,8 @@ onMounted(() => {
       :aria-describedby="ariaDescribedby"
       :data-state="dataState"
       @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
+      @focus="handleFocus"
+      @blur="handleBlur"
     >
       <option v-if="placeholder" value="" disabled :selected="!modelValue">
         {{ placeholder }}

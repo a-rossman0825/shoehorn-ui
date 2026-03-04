@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useAttrs } from "vue";
+import { useFocus } from "../../composables";
 
 const props = withDefaults(
   defineProps<{
@@ -21,10 +22,23 @@ const props = withDefaults(
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
   change: [checked: boolean, event: Event];
+  focus: [event: FocusEvent];
+  blur: [event: FocusEvent];
 }>();
 
 const attrs = useAttrs();
-const switchRef = ref<HTMLButtonElement>();
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLButtonElement>();
+
+function handleFocus(event: FocusEvent) {
+  onFocus();
+  emit("focus", event);
+}
+
+function handleBlur(event: FocusEvent) {
+  onBlur();
+  emit("blur", event);
+}
 
 const switchId = computed(() => {
   return props.id ?? `sh-switch-${Math.random().toString(36).slice(2)}`;
@@ -56,8 +70,8 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 defineExpose({
-  focus: () => switchRef.value?.focus(),
-  blur: () => switchRef.value?.blur(),
+  focus,
+  blur,
 });
 
 onMounted(() => {
@@ -93,7 +107,7 @@ onMounted(() => {
   <div class="sh-switch">
     <button
       :id="switchId"
-      ref="switchRef"
+      ref="elementRef"
       type="button"
       role="switch"
       class="sh-switch__control"
@@ -110,6 +124,8 @@ onMounted(() => {
       :data-state="dataState"
       @click="toggle"
       @keydown="onKeydown"
+      @focus="handleFocus"
+      @blur="handleBlur"
     >
       <span class="sh-switch__thumb" :data-state="dataState" />
     </button>
@@ -133,7 +149,7 @@ onMounted(() => {
       :id="`${switchId}-label`"
       :for="switchId"
       class="sh-switch__label"
-      @click="switchRef?.focus()"
+      @click="focus"
     >
       {{ label }}
     </label>

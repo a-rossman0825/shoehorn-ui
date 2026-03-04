@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
+import { useFocus } from "../../composables";
 
 const props = withDefaults(
   defineProps<{
@@ -35,8 +36,8 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const isFocused = ref(false);
-const textareaRef = ref<HTMLTextAreaElement>();
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLTextAreaElement>();
 
 const textareaId = computed(() => {
   return props.id ?? `sh-textarea-${Math.random().toString(36).slice(2)}`;
@@ -72,20 +73,20 @@ function onInput(event: Event) {
   emit("update:modelValue", target.value);
 }
 
-function onFocus(event: FocusEvent) {
-  isFocused.value = true;
+function handleFocus(event: FocusEvent) {
+  onFocus();
   emit("focus", event);
 }
 
-function onBlur(event: FocusEvent) {
-  isFocused.value = false;
+function handleBlur(event: FocusEvent) {
+  onBlur();
   emit("blur", event);
 }
 
 defineExpose({
-  focus: () => textareaRef.value?.focus(),
-  blur: () => textareaRef.value?.blur(),
-  select: () => textareaRef.value?.select(),
+  focus,
+  blur,
+  select: () => elementRef.value?.select(),
 });
 
 onMounted(() => {
@@ -125,7 +126,7 @@ onMounted(() => {
 
     <textarea
       :id="textareaId"
-      ref="textareaRef"
+      ref="elementRef"
       class="sh-textarea__control"
       :name="name"
       :value="modelValue"
@@ -144,8 +145,8 @@ onMounted(() => {
       :data-state="dataState"
       :data-resize="resize"
       @input="onInput"
-      @focus="onFocus"
-      @blur="onBlur"
+      @focus="handleFocus"
+      @blur="handleBlur"
     />
 
     <p v-if="description" :id="descriptionId" class="sh-textarea__description">

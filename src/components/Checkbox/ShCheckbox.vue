@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
+import { useFocus } from "../../composables";
 
 type CheckedState = boolean | "indeterminate";
 
@@ -26,10 +27,13 @@ const emit = defineEmits<{
   "update:modelValue": [value: boolean];
   "update:indeterminate": [value: boolean];
   change: [event: Event];
+  focus: [event: FocusEvent];
+  blur: [event: FocusEvent];
 }>();
 
 const attrs = useAttrs();
-const checkboxRef = ref<HTMLInputElement>();
+const { elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLInputElement>();
 
 const checkboxId = computed(() => {
   return props.id ?? `sh-checkbox-${Math.random().toString(36).slice(2)}`;
@@ -61,15 +65,25 @@ function onKeydown(event: KeyboardEvent) {
   if (event.key === " ") {
     event.preventDefault();
     if (!props.disabled) {
-      checkboxRef.value?.click();
+      elementRef.value?.click();
     }
   }
 }
 
 defineExpose({
-  focus: () => checkboxRef.value?.focus(),
-  blur: () => checkboxRef.value?.blur(),
+  focus,
+  blur,
 });
+
+function handleFocus(event: FocusEvent){
+  onFocus();
+  emit("focus", event); 
+}
+
+function handleBlur(event: FocusEvent){
+  onBlur();
+  emit("blur", event);
+}
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
@@ -99,8 +113,8 @@ onMounted(() => {
   }
 
   // Sync indeterminate state with DOM
-  if (checkboxRef.value) {
-    checkboxRef.value.indeterminate = props.indeterminate;
+  if (elementRef.value) {
+    elementRef.value.indeterminate = props.indeterminate;
   }
 });
 
@@ -109,18 +123,20 @@ import { watch } from "vue";
 watch(
   () => props.indeterminate,
   (value) => {
-    if (checkboxRef.value) {
-      checkboxRef.value.indeterminate = value;
+    if (elementRef.value) {
+      elementRef.value.indeterminate = value;
     }
   },
 );
+
+
 </script>
 
 <template>
   <div class="sh-checkbox">
     <input
       :id="checkboxId"
-      ref="checkboxRef"
+      ref="elementRef"
       type="checkbox"
       class="sh-checkbox__input"
       :name="name"
@@ -135,7 +151,11 @@ watch(
       :data-state="dataState"
       @change="onChange"
       @keydown="onKeydown"
+      @focus="handleFocus"
+      @blur="handleBlur"
     />
+    function handleFocus(event: FocusEvent) { onFocus(); emit("focus", event); }
+    function handleBlur(event: FocusEvent) { onBlur(); emit("blur", event); }
     <label v-if="label" :for="checkboxId" class="sh-checkbox__label">
       {{ label }}
     </label>

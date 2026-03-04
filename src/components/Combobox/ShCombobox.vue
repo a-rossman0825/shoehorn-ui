@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
+import { useFocus } from "../../composables";
 
 export interface ComboboxOption {
   value: string | number;
@@ -26,7 +27,8 @@ const emit = defineEmits<{
   "update:modelValue": [value: string | number | undefined];
 }>();
 
-const inputRef = ref<HTMLInputElement>();
+const { elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLInputElement>();
 const listboxRef = ref<HTMLElement>();
 const isOpen = ref(false);
 const activeIndex = ref(-1);
@@ -69,7 +71,7 @@ const openListbox = () => {
 const closeListbox = () => {
   isOpen.value = false;
   searchQuery.value = "";
-  inputRef.value?.blur();
+  elementRef.value?.blur();
 };
 
 const selectOption = (option: ComboboxOption) => {
@@ -131,17 +133,22 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
-const handleBlur = (event: FocusEvent) => {
+function handleFocus(event: FocusEvent) {
+  onFocus();
+  // Optionally, open the listbox on focus (existing behavior)
+  openListbox();
+}
+
+function handleBlur(event: FocusEvent) {
+  onBlur();
   // Close listbox if focus moves outside component
   const relatedTarget = event.relatedTarget as Node;
   if (!listboxRef.value?.contains(relatedTarget)) {
     closeListbox();
   }
-};
+}
 
-const focus = () => inputRef.value?.focus();
-const blur = () => inputRef.value?.blur();
-
+defineExpose({ focus, blur });
 defineExpose({ focus, blur });
 
 onMounted(() => {
@@ -167,7 +174,7 @@ onMounted(() => {
   <div class="sh-combobox">
     <div class="sh-combobox__wrapper">
       <input
-        ref="inputRef"
+        ref="elementRef"
         type="text"
         role="combobox"
         class="sh-combobox__input"
@@ -182,7 +189,7 @@ onMounted(() => {
         "
         @input="handleInput"
         @keydown="handleKeydown"
-        @focus="openListbox"
+        @focus="handleFocus"
         @blur="handleBlur"
       />
 

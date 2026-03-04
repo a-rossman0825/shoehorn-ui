@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
+import { useFocus } from "../../composables";
 
 type InputType = "text" | "email" | "password" | "search" | "url" | "tel";
 
@@ -36,13 +37,13 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const isFocused = ref(false);
-const inputRef = ref<HTMLInputElement>();
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLInputElement>();
 
 defineExpose({
-  focus: () => inputRef.value?.focus(),
-  blur: () => inputRef.value?.blur(),
-  select: () => inputRef.value?.select(),
+  focus,
+  blur,
+  select: () => elementRef.value?.select(),
 });
 
 function getAriaAttrs() {
@@ -87,13 +88,13 @@ function onInput(event: Event) {
   emit("update:modelValue", target.value);
 }
 
-function onFocus(event: FocusEvent) {
-  isFocused.value = true;
+function handleFocus(event: FocusEvent) {
+  onFocus();
   emit("focus", event);
 }
 
-function onBlur(event: FocusEvent) {
-  isFocused.value = false;
+function handleBlur(event: FocusEvent) {
+  onBlur();
   emit("blur", event);
 }
 
@@ -149,7 +150,7 @@ onMounted(() => {
 
     <input
       :id="inputId"
-      ref="inputRef"
+      ref="elementRef"
       class="sh-input__control"
       :type="type"
       :name="name"
@@ -168,8 +169,8 @@ onMounted(() => {
       :aria-describedby="ariaDescribedby"
       :data-state="dataState"
       @input="onInput"
-      @focus="onFocus"
-      @blur="onBlur"
+      @focus="handleFocus"
+      @blur="handleBlur"
     />
 
     <p v-if="description" :id="descriptionId" class="sh-input__description">

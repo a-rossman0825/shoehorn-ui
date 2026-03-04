@@ -1,2 +1,2 @@
-// intentionally empty
-export {}
+// intentionally left empty
+export * from "./useFocus";
