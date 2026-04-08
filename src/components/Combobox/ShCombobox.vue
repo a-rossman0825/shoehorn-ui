@@ -25,6 +25,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | number | undefined];
+  focus: [event: FocusEvent];
+  blur: [event: FocusEvent];
 }>();
 
 const { elementRef, focus, blur, onFocus, onBlur } =
@@ -40,9 +42,9 @@ const selectedOption = computed(() =>
 
 const displayValue = computed(() => selectedOption.value?.label || "");
 
-const defaultFilter = (option: ComboboxOption, query: string) => {
+function defaultFilter(option: ComboboxOption, query: string) {
   return option.label.toLowerCase().includes(query.toLowerCase());
-};
+}
 
 const filteredOptions = computed(() => {
   if (!searchQuery.value) return props.options;
@@ -62,32 +64,32 @@ watch(isOpen, (open) => {
   }
 });
 
-const openListbox = () => {
+function openListbox() {
   if (!props.disabled) {
     isOpen.value = true;
   }
-};
+}
 
-const closeListbox = () => {
+function closeListbox() {
   isOpen.value = false;
   searchQuery.value = "";
   elementRef.value?.blur();
-};
+}
 
-const selectOption = (option: ComboboxOption) => {
+function selectOption(option: ComboboxOption) {
   if (!option.disabled) {
     emit("update:modelValue", option.value);
     closeListbox();
   }
-};
+}
 
-const handleInput = (event: Event) => {
+function handleInput(event: Event) {
   const target = event.target as HTMLInputElement;
   searchQuery.value = target.value;
   isOpen.value = true;
-};
+}
 
-const handleKeydown = (event: KeyboardEvent) => {
+function handleKeydown(event: KeyboardEvent) {
   switch (event.key) {
     case "ArrowDown":
       event.preventDefault();
@@ -131,17 +133,17 @@ const handleKeydown = (event: KeyboardEvent) => {
       }
       break;
   }
-};
+}
 
 function handleFocus(event: FocusEvent) {
   onFocus();
-  // Optionally, open the listbox on focus (existing behavior)
+  emit("focus", event);
   openListbox();
 }
 
 function handleBlur(event: FocusEvent) {
   onBlur();
-  // Close listbox if focus moves outside component
+  emit("blur", event);
   const relatedTarget = event.relatedTarget as Node;
   if (!listboxRef.value?.contains(relatedTarget)) {
     closeListbox();

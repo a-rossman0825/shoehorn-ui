@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
+import { computed } from "vue";
 
 interface AccordionItem {
   id: string;
@@ -31,15 +31,18 @@ const openItems = computed({
 function toggle(itemId: string, disabled?: boolean) {
   if (disabled) return;
 
+  const itemIsOpen = openItems.value.includes(itemId);
+
   if (props.multiple) {
-    if (openItems.value.includes(itemId)) {
+    if (itemIsOpen) {
       openItems.value = openItems.value.filter((id) => id !== itemId);
     } else {
       openItems.value = [...openItems.value, itemId];
     }
-  } else {
-    openItems.value = openItems.value.includes(itemId) ? [] : [itemId];
+    return;
   }
+
+  openItems.value = itemIsOpen ? [] : [itemId];
 }
 
 function isOpen(itemId: string) {

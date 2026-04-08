@@ -37,7 +37,7 @@ function selectTab(tabId: string, disabled?: boolean) {
   }
 }
 
-function onKeydown(event: KeyboardEvent, index: number) {
+function onKeydown(event: KeyboardEvent) {
   if (!props.tabs) return;
 
   const enabledTabs = props.tabs.filter((t) => !t.disabled);
@@ -95,7 +95,7 @@ provide("tabs", {
         :disabled="tab.disabled"
         :data-state="activeTab === tab.id ? 'active' : 'inactive'"
         @click="selectTab(tab.id, tab.disabled)"
-        @keydown="onKeydown($event, index)"
+        @keydown="onKeydown($event)"
       >
         {{ tab.label }}
       </button>

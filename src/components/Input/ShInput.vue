@@ -113,7 +113,7 @@ onMounted(() => {
       );
     }
 
-    // Warn if required but no visual indicator in label
+    // NOTE: Required fields should look required, not just be required in code.
     if (
       props.required &&
       props.label &&
@@ -126,7 +126,7 @@ onMounted(() => {
       );
     }
 
-    // Suggest autocomplete for specific input types
+    // NOTE: These input types usually benefit from autocomplete hints.
     const shouldHaveAutocomplete = ["email", "tel", "url"].includes(props.type);
     if (
       shouldHaveAutocomplete &&

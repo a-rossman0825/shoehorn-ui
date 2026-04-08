@@ -1,4 +1,4 @@
-// ShDialog styles
+// NOTE: dialog overlay/content layout.
 .sh-dialog-overlay {
   position: fixed;
   inset: 0;
@@ -51,7 +51,7 @@
   margin-top: 1.5rem;
 }
 
-// Transitions
+// NOTE: open/close transitions.
 .sh-dialog-enter-active,
 .sh-dialog-leave-active {
   transition: opacity 0.2s ease;

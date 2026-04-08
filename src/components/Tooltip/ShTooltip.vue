@@ -30,9 +30,9 @@ function hide() {
   isVisible.value = false;
 }
 
-const tooltipId = computed(
-  () => `sh-tooltip-${Math.random().toString(36).slice(2)}`,
-);
+const tooltipId = computed(() => {
+  return `sh-tooltip-${Math.random().toString(36).slice(2)}`;
+});
 
 onUnmounted(() => {
   clearTimeout(timeoutId.value);

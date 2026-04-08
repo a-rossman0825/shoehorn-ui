@@ -12,7 +12,11 @@ const props = withDefaults(
   },
 );
 
-const forValue = computed(() => props.htmlFor || props.for);
+function getForValue() {
+  return props.htmlFor || props.for;
+}
+
+const forValue = computed(getForValue);
 
 const attrs = useAttrs();
 

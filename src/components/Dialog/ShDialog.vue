@@ -77,7 +77,7 @@ watch(
 
       await nextTick();
 
-      // Focus first focusable element or dialog itself
+      // NOTE: Put focus inside the dialog as soon as it opens.
       const focusable = dialogRef.value?.querySelector(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ) as HTMLElement;
@@ -88,13 +88,13 @@ watch(
         dialogRef.value?.focus();
       }
 
-      // Lock body scroll
+      // NOTE: Prevent background scroll while modal is open.
       document.body.style.overflow = "hidden";
     } else {
-      // Unlock body scroll
+      // NOTE: Re-enable background scroll on close.
       document.body.style.overflow = "";
 
-      // Restore focus
+      // NOTE: Return focus to whatever had focus before open.
       previouslyFocused.value?.focus();
     }
   },

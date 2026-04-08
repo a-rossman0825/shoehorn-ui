@@ -24,7 +24,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "click", mouseEvent: MouseEvent): void;
+  click: [mouseEvent: MouseEvent];
 }>();
 
 const isButton = computed(() => props.as === "button");
@@ -43,13 +43,13 @@ function onKeydown(event: KeyboardEvent) {
 
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault();
-    // Create a synthetic MouseEvent for consistency
-    const syntheticEvent = new MouseEvent("click", {
+    // NOTE: Keep keyboard activation on the same click event path.
+    const syntheticClick = new MouseEvent("click", {
       bubbles: event.bubbles,
       cancelable: event.cancelable,
       view: window,
     });
-    emit("click", syntheticEvent);
+    emit("click", syntheticClick);
   }
 }
 
@@ -69,17 +69,17 @@ onMounted(() => {
       }
     }
 
-    // Check for accessible text content
+    // NOTE: Icon-only buttons still need an accessible name.
     const hasAriaLabel = "aria-label" in attrs;
     const hasAriaLabelledBy = "aria-labelledby" in attrs;
     const hasSlotContent =
       slots.default &&
       slots.default().some((vnode) => {
-        // Check if slot has text content
+        // NOTE: Plain text slot content is already a valid label.
         if (typeof vnode.children === "string") {
           return vnode.children.trim().length > 0;
         }
-        // For more complex slot content, assume it's okay
+        // NOTE: Non-text slot content is assumed intentional.
         return vnode.children !== null;
       });
 

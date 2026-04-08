@@ -15,35 +15,40 @@ const emit = defineEmits<{
   submit: [event: Event];
 }>();
 
-// Form context for child components
+// NOTE: Share form metadata with child components.
 const formName = ref(props.name);
 provide("formName", formName);
+const formRef = ref<HTMLElement>();
 
-const handleSubmit = (event: Event) => {
+function handleSubmit(event: Event) {
   emit("submit", event);
-};
+}
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
-    const form = event?.target as HTMLFormElement;
-    if (form) {
-      const inputs = form.querySelectorAll("[required]");
-      const hasRequiredInputs = inputs.length > 0;
-      const hasSubmitButton = form.querySelector('[type="submit"]');
+    if (!(formRef.value instanceof HTMLFormElement)) return;
 
-      if (hasRequiredInputs && !hasSubmitButton) {
-        console.warn(
-          "[ShForm] Form has required fields but no submit button. " +
-            'Add a button with type="submit" for proper form submission.',
-        );
-      }
+    const inputs = formRef.value.querySelectorAll("[required]");
+    const hasRequiredInputs = inputs.length > 0;
+    const hasSubmitButton = formRef.value.querySelector('[type="submit"]');
+
+    if (hasRequiredInputs && !hasSubmitButton) {
+      console.warn(
+        "[ShForm] Form has required fields but no submit button. " +
+          'Add a button with type="submit" for proper form submission.',
+      );
     }
   }
 });
 </script>
 
 <template>
-  <component :is="as" class="sh-form" @submit.prevent="handleSubmit">
+  <component
+    ref="formRef"
+    :is="as"
+    class="sh-form"
+    @submit.prevent="handleSubmit"
+  >
     <slot />
   </component>
 </template>

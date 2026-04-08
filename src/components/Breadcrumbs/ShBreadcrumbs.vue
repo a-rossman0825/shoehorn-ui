@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 
 interface BreadcrumbItem {
   label: string;
@@ -17,6 +17,8 @@ const props = withDefaults(
   },
 );
 
+const breadcrumbItems = computed(() => props.items ?? []);
+
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
     if (!props.items || props.items.length === 0) {
@@ -33,7 +35,7 @@ onMounted(() => {
   <nav aria-label="Breadcrumb" class="sh-breadcrumbs">
     <ol class="sh-breadcrumbs__list">
       <li
-        v-for="(item, index) in items"
+        v-for="(item, index) in breadcrumbItems"
         :key="index"
         class="sh-breadcrumbs__item"
       >
@@ -53,7 +55,7 @@ onMounted(() => {
         </span>
 
         <span
-          v-if="index < items!.length - 1"
+          v-if="index < breadcrumbItems.length - 1"
           class="sh-breadcrumbs__separator"
           aria-hidden="true"
         >

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
 import { useFocus } from "../../composables";
 
 const props = withDefaults(
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
+const { elementRef, focus, blur, onFocus, onBlur } =
   useFocus<HTMLButtonElement>();
 
 function handleFocus(event: FocusEvent) {
@@ -130,7 +130,7 @@ onMounted(() => {
       <span class="sh-switch__thumb" :data-state="dataState" />
     </button>
 
-    <!-- Hidden input for form submission -->
+    <!-- NOTE: Hidden input keeps this switch form-friendly when `name` is passed. -->
     <input
       v-if="name"
       type="checkbox"

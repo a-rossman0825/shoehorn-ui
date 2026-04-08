@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
+import { computed, onMounted, useAttrs, watch } from "vue";
 import { useFocus } from "../../composables";
-
-type CheckedState = boolean | "indeterminate";
 
 const props = withDefaults(
   defineProps<{
@@ -51,7 +49,7 @@ function onChange(event: Event) {
 
   const target = event.target as HTMLInputElement;
 
-  // If going from indeterminate to checked, clear indeterminate
+  // NOTE: Once the user checks it, we clear the mixed state.
   if (props.indeterminate) {
     emit("update:indeterminate", false);
   }
@@ -61,7 +59,7 @@ function onChange(event: Event) {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  // Space should toggle checkbox
+  // NOTE: Match native checkbox keyboard behavior.
   if (event.key === " ") {
     event.preventDefault();
     if (!props.disabled) {
@@ -75,12 +73,12 @@ defineExpose({
   blur,
 });
 
-function handleFocus(event: FocusEvent){
+function handleFocus(event: FocusEvent) {
   onFocus();
-  emit("focus", event); 
+  emit("focus", event);
 }
 
-function handleBlur(event: FocusEvent){
+function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }
@@ -112,14 +110,13 @@ onMounted(() => {
     }
   }
 
-  // Sync indeterminate state with DOM
+  // NOTE: Keep DOM `indeterminate` in sync on first render.
   if (elementRef.value) {
     elementRef.value.indeterminate = props.indeterminate;
   }
 });
 
-// Watch for indeterminate changes
-import { watch } from "vue";
+// NOTE: Keep DOM `indeterminate` in sync when prop changes later.
 watch(
   () => props.indeterminate,
   (value) => {
@@ -128,8 +125,6 @@ watch(
     }
   },
 );
-
-
 </script>
 
 <template>
@@ -154,8 +149,6 @@ watch(
       @focus="handleFocus"
       @blur="handleBlur"
     />
-    function handleFocus(event: FocusEvent) { onFocus(); emit("focus", event); }
-    function handleBlur(event: FocusEvent) { onBlur(); emit("blur", event); }
     <label v-if="label" :for="checkboxId" class="sh-checkbox__label">
       {{ label }}
     </label>

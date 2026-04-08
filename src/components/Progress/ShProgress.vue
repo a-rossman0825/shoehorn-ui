@@ -17,13 +17,16 @@ const props = withDefaults(
 
 const attrs = useAttrs();
 
-const percentage = computed(() => {
+function getPercentage() {
   return Math.min(100, Math.max(0, (props.value / props.max) * 100));
-});
+}
 
-const valueText = computed(() => {
+function getValueText() {
   return `${Math.round(percentage.value)}%`;
-});
+}
+
+const percentage = computed(getPercentage);
+const valueText = computed(getValueText);
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {

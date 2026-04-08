@@ -53,11 +53,11 @@ const pages = computed(() => {
   return pageNumbers;
 });
 
-const goToPage = (page: number) => {
+function goToPage(page: number) {
   if (page >= 1 && page <= totalPages.value && page !== props.modelValue) {
     emit("update:modelValue", page);
   }
-};
+}
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
@@ -74,7 +74,7 @@ onMounted(() => {
 <template>
   <nav aria-label="Pagination" class="sh-pagination">
     <ul class="sh-pagination__list">
-      <!-- First page -->
+      <!-- NOTE: jump to first page -->
       <li v-if="showFirstLast" class="sh-pagination__item">
         <button
           type="button"
@@ -87,7 +87,7 @@ onMounted(() => {
         </button>
       </li>
 
-      <!-- Previous page -->
+      <!-- NOTE: previous page -->
       <li class="sh-pagination__item">
         <button
           type="button"
@@ -100,7 +100,7 @@ onMounted(() => {
         </button>
       </li>
 
-      <!-- Page numbers -->
+      <!-- NOTE: visible page buttons -->
       <li
         v-for="(page, index) in pages"
         :key="index"
@@ -126,7 +126,7 @@ onMounted(() => {
         </button>
       </li>
 
-      <!-- Next page -->
+      <!-- NOTE: next page -->
       <li class="sh-pagination__item">
         <button
           type="button"
@@ -139,7 +139,7 @@ onMounted(() => {
         </button>
       </li>
 
-      <!-- Last page -->
+      <!-- NOTE: jump to last page -->
       <li v-if="showFirstLast" class="sh-pagination__item">
         <button
           type="button"

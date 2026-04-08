@@ -15,10 +15,12 @@ const props = withDefaults(
 
 const attrs = useAttrs();
 
-const displayCount = computed(() => {
+function getDisplayCount() {
   if (props.count === undefined) return null;
   return props.count > 99 ? "99+" : props.count.toString();
-});
+}
+
+const displayCount = computed(getDisplayCount);
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {

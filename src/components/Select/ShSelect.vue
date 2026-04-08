@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from "vue";
-import { useFocus } from "../../composables/"
+import { computed, onMounted, useAttrs } from "vue";
+import { useFocus } from "../../composables";
 
 interface SelectOption {
   value: string;
@@ -35,7 +35,8 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const { elementRef, focus, blur, onFocus, onBlur } = useFocus<HTMLSelectElement>();
+const { elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLSelectElement>();
 
 const selectId = computed(() => {
   return props.id ?? `sh-select-${Math.random().toString(36).slice(2)}`;
@@ -79,7 +80,7 @@ function handleFocus(event: FocusEvent) {
   emit("focus", event);
 }
 
-function handleBlur(event: FocusEvent){
+function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }

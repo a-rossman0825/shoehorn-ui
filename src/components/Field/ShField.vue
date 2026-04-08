@@ -18,7 +18,7 @@ const formName = inject("formName", null);
 
 const fieldId = computed(() => {
   if (props.for) return props.for;
-  // Generate a unique ID based on label
+  // NOTE: Fallback ID keeps label/description/error wiring stable.
   if (props.label) {
     return `field-${props.label.toLowerCase().replace(/\s+/g, "-")}`;
   }

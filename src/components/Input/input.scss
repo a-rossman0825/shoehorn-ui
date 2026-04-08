@@ -1,13 +1,13 @@
 @use "../../styles/focus" as *;
 
-/* Layout & disp */
+/* NOTE: wrapper layout */
 .sh-input {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-/* Hit target & readability */
+/* NOTE: input sizing/readability */
 .sh-input__control {
   width: 100%;
   min-height: 40px;
@@ -17,7 +17,7 @@
   border: 1px solid currentColor;
 }
 
-/* Disabled state */
+/* NOTE: disabled visuals */
 .sh-input__control:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -27,12 +27,12 @@
   @include sh-focus-ring;
 }
 
-/* Error state (visual + ARIA) */
+/* NOTE: invalid state visuals */
 .sh-input[data-state="invalid"] .sh-input__control {
   border-color: red;
 }
 
-/* Label spacing */
+/* NOTE: label spacing */
 .sh-input__label {
   display: block;
   margin-bottom: 0.25rem;

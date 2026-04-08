@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, provide, ref, useAttrs } from "vue";
+import { computed, onMounted, provide, useAttrs } from "vue";
 
 interface RadioOption {
   value: string;
@@ -33,9 +33,8 @@ const attrs = useAttrs();
 const groupId = computed(
   () => `sh-radio-group-${Math.random().toString(36).slice(2)}`,
 );
-const activeIndex = ref(0);
 
-// Provide group context to child radios
+// NOTE: Expose group-level state/actions to child radios.
 provide("radioGroup", {
   name: props.name || groupId.value,
   modelValue: computed(() => props.modelValue),
@@ -80,7 +79,7 @@ function onKeydown(event: KeyboardEvent) {
   }
 
   if (handled) {
-    // Focus the newly selected radio
+    // NOTE: Keep keyboard nav and focus in sync.
     setTimeout(() => {
       const selectedRadio = document.querySelector(
         `input[name="${props.name || groupId.value}"][value="${props.modelValue}"]`,

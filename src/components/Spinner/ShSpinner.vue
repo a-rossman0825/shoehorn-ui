@@ -15,6 +15,10 @@ const props = withDefaults(
 
 const attrs = useAttrs();
 
+const resolvedLabel = computed(() => {
+  return props.label || (attrs["aria-label"] as string | undefined);
+});
+
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
     const hasLabel =
@@ -36,7 +40,7 @@ onMounted(() => {
   <div
     class="sh-spinner"
     role="status"
-    :aria-label="label || (attrs['aria-label'] as string | undefined)"
+    :aria-label="resolvedLabel"
     :aria-labelledby="attrs['aria-labelledby'] as string | undefined"
     :aria-live="
       (attrs['aria-live'] as 'off' | 'polite' | 'assertive' | undefined) ||

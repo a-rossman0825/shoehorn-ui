@@ -1,5 +1,5 @@
 <script setup lang="ts">
-withDefaults(
+const props = withDefaults(
   defineProps<{
     as?: "div" | "article" | "section";
   }>(),
@@ -10,7 +10,7 @@ withDefaults(
 </script>
 
 <template>
-  <component :is="as" class="sh-card">
+  <component :is="props.as" class="sh-card">
     <slot />
   </component>
 </template>
