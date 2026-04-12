@@ -23,5 +23,19 @@ describe("ShButton", () => {
     const event = wrapper.emitted("click");
     if (!event) throw new Error('event does not exist/is falsy');
     expect(event.length).toBe(1);
-  })
+  });
+
+  it ("does not emit 'click' when props: disabled = true", async () => {
+    const wrapper = mount(ShButton, { props: { disabled: true }});
+    const btn = wrapper.find("button");
+    await btn.trigger('click');
+    expect(wrapper.emitted("click")).toBeFalsy();
+  });
+
+  it ("anchor emits 'click' on 'enter' keydown event", async () => {
+    const wrapper = mount(ShButton, { props: { as: 'a' }, attrs: { href: "#" }});
+    const anchor = wrapper.find("a");
+    await anchor.trigger('keydown', { key: 'Enter' });
+    expect(wrapper.emitted("click")).toBeTruthy();
+  });
 });

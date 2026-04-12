@@ -20,8 +20,12 @@ coverage/
 # OS / Editor
 .DS_Store
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 
 # Env
 .env
 .env.*
+!.env.example
