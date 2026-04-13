@@ -1,6 +1,9 @@
 <script setup lang="ts">
 /* eslint-disable vue/require-default-prop, vue/no-required-prop-with-default */
-import { computed, onMounted, useAttrs, useSlots } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
+import { getAttrString } from "../../utils";
+import { useHasSlotText } from "../../composables";
+import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
 type ButtonType = "button" | "submit" | "reset";
 type ButtonVariant = "default" | "primary" | "ghost";
@@ -24,7 +27,6 @@ type ButtonProps = ButtonElementProps &
   };
 
 const attrs = useAttrs() as Record<string, unknown>;
-const slots = useSlots();
 
 const props = withDefaults(defineProps<ButtonProps>(), {
   as: "button",
@@ -41,21 +43,23 @@ const emit = defineEmits<{
 
 const isButton = computed(() => props.as === "button");
 
+/* NOTE - refactor: use "getAttrString()" util instead.
 function getAttrString(name: string) {
   const value = attrs[name];
   return typeof value === "string" && value.trim().length > 0
     ? value
     : undefined;
 }
+    */
 
 const resolvedAriaLabelledBy = computed(() => {
-  const attrLabelledBy = getAttrString("aria-labelledby");
+  const attrLabelledBy = getAttrString(attrs, "aria-labelledby");
   if (attrLabelledBy) return attrLabelledBy;
   return props.labelledBy;
 });
 
 const resolvedAriaLabel = computed(() => {
-  const attrLabel = getAttrString("aria-label");
+  const attrLabel = getAttrString(attrs, "aria-label");
   if (attrLabel) return attrLabel;
   if (resolvedAriaLabelledBy.value) return undefined;
   return props.label;
@@ -84,8 +88,13 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
+const slotHasText = useHasSlotText();
+
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
+    
+    const hasSlotText = slotHasText();
+
     if (props.as === "a" && !props.href) {
       console.warn(
         '[ShButton] as="a" was used without an href. ' +
@@ -94,28 +103,32 @@ onMounted(() => {
       );
     }
 
-    // NOTE - Icon-only buttons need an explicit accessible name.
+    /* NOTE - refactor: use "useHasSlotText()" composable instead.
     const hasSlotContent =
       slots.default &&
       slots.default().some((vnode) => {
-        // NOTE - Plain text slot content is already a valid label.
         if (typeof vnode.children === "string") {
           return vnode.children.trim().length > 0;
         }
-        // NOTE - Non-text slot content is assumed intentional.
         return vnode.children !== null;
       });
-
+    */
+    /* NOTE - refactor: use "hasAccessibleName()" util instead.
     const hasAccessibleName =
       Boolean(resolvedAriaLabel.value) ||
       Boolean(resolvedAriaLabelledBy.value) ||
-      Boolean(hasSlotContent);
-
-    if (props.iconOnly && !hasAccessibleName) {
+      Boolean(hasSlotText);
+    */
+    const accessible = hasAccessibleName(
+      resolvedAriaLabel.value,
+      resolvedAriaLabelledBy.value,
+      hasSlotText,
+    );
+    if (props.iconOnly && !accessible) {
       console.warn(
         "[ShButton] iconOnly=true requires `label` or `labelledBy` (or `aria-label` / `aria-labelledby`).",
       );
-    } else if (!hasAccessibleName) {
+    } else if (!accessible) {
       console.warn(
         "[ShButton] Button has no accessible name. " +
           "Provide visible text, `label`, `labelledBy`, `aria-label`, or `aria-labelledby`.",

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs, useSlots } from "vue";
+import { computed, onMounted, useAttrs } from "vue";
+import { useHasSlotText } from "../../composables/useSlotText";
+import { getAttrString } from "../../utils";
+import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
 type badgeVariant = "default" | "success" | "warning" | "error" | "info";
 
@@ -21,7 +24,6 @@ const props = withDefaults(
 );
 
 const attrs = useAttrs();
-const slots = useSlots();
 
 const displayCount = computed(() => {
   if (props.count === undefined) return 0;
@@ -37,44 +39,61 @@ function getFallbackDisplayCount(): string | undefined {
   return `notification count: ${props.count}`;
 }
 
-function getAttrString(name: string): string | undefined {
-  const value = attrs[name];
-  return typeof value === "string" && value.trim().length > 0
-    ? value
-    : undefined;
-}
+/* NOTE - refactor: use getAttrString() util instead.
+  function getAttrString(name: string): string | undefined {
+    const value = attrs[name];
+    return typeof value === "string" && value.trim().length > 0
+      ? value
+      : undefined;
+  }
+*/
 
 const resolvedAriaLabelledBy = computed(() => {
-  const attrLabelledBy = getAttrString("aria-labelledby");
+  const attrLabelledBy = getAttrString(attrs, "aria-labelledby");
   if (attrLabelledBy) return attrLabelledBy;
   return props.labelledBy;
 });
 
 const resolvedAriaLabel = computed(() => {
-  const attrLabel = getAttrString("aria-label");
+  const attrLabel = getAttrString(attrs, "aria-label");
   if (attrLabel) return attrLabel;
   if (resolvedAriaLabelledBy.value) return undefined;
   if (props.label) return props.label;
   return getFallbackDisplayCount();
 });
 
+/* NOTE - refactor: use "useHasSlotText()" composable instead.
+function hasSlotText() {
+  if (!slots.default) return false;
+  const result = slots.default();
+  if (!result) return false;
+  return result.some((vnode) => {
+    if (typeof vnode.children === "string") {
+      return vnode.children.trim().length > 0;
+    }
+    return vnode.children !== null;
+  })
+ } */
+
+const hasSlotText = useHasSlotText();
+
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
-    const hasTextSlot =
-      slots.default &&
-      slots.default().some((vnode) => {
-        if (typeof vnode.children === "string") {
-          return vnode.children.trim().length > 0;
-        }
-        return vnode.children !== null;
-      });
 
+    const slotHasText = hasSlotText();
+    /* NOTE - refactor: use "hasAccessibleName()" util instead.
     const hasAccessibleName =
       Boolean(resolvedAriaLabel.value) ||
       Boolean(resolvedAriaLabelledBy.value) ||
-      Boolean(hasTextSlot);
+      Boolean(hasSlotText);
+      */
+    const accessible = hasAccessibleName(
+      resolvedAriaLabel.value,
+      resolvedAriaLabelledBy.value,
+      slotHasText,
+    );
 
-    if (!hasAccessibleName) {
+    if (!accessible) {
       console.warn(
         "[ShBadge] has no accessible name" +
           "Provide text content, `label`, `labelledBy`, `aria-label`, or `aria-labelledby`.",
