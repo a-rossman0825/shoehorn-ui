@@ -71,4 +71,20 @@ describe("ShBadge", () => {
       "notification count: 99 or more",
     );
   });
+
+  it ("respects aria-label attr fallback override order", () => {
+    const wrapper = mount(ShBadge, {
+      props: { label: "prop-label" },
+      attrs: { "aria-label": "attr-label" }
+    });
+    expect(wrapper.attributes("aria-label")).toBe("attr-label");
+  });
+
+  it("renders slot content instead of displayCount", () => {
+    const wrapper = mount(ShBadge, {
+      props: { count: 5 },
+      slots: { default: "Test text" }
+    });
+    expect(wrapper.text()).toBe("Test text");
+  });
 });
