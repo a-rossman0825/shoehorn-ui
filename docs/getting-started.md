@@ -64,14 +64,6 @@ This is completely optional, tree-shaking works better with direct imports.
 
 ---
 
-## Philosophy
-
-- No forced styles
-- No design tokens
-- No CSS framework assumptions
-- Accessibility first/non-negotiable
-- Styling is the consumer's responsibility
-
 See:
 
 - [styling.md](./styling.md)
