@@ -1,2 +1,1 @@
-// intentionally empty
-export {};
+export * from "./getAttrString";
