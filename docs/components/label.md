@@ -4,71 +4,134 @@ An accessible label component for form controls.
 
 ---
 
-## Basic Usage
+## Usage, Options, and Requirements:
+
+### Basic Label
 
 ```vue
-<template>
-  <ShLabel for="email-input"> Email address </ShLabel>
-  <ShInput id="email-input" />
-</template>
+<ShLabel for="email">Email Address</ShLabel>
+<ShInput id="email" />
 ```
 
----
+#### Acts as:
 
-## Required Field
+A native `<label>` element that associates with a form control via the `for` attribute.
+
+#### Optional Attributes:
+
+##### Required
+
+`true` | `false`
+
+- Adds visual indicator (styling hook via `data-required`).
+- Defaults to `false` if not specified.
+
+Usage:
 
 ```vue
-<template>
-  <ShLabel for="name" :required="true"> Name </ShLabel>
-  <ShInput id="name" required />
-</template>
+<ShLabel for="password" :required="true">Password</ShLabel>
+<ShInput id="password" required />
 ```
 
+##### SrOnly
+
+`true` | `false`
+
+- Hides label visually but keeps it in the accessibility tree.
+- Useful when placeholder or other visual cues convey the input's purpose.
+- Defaults to `false` if not specified.
+
+Usage:
+
+```vue
+<!-- Label hidden visually, still accessible to screen readers -->
+<ShLabel for="search" srOnly>Search users</ShLabel>
+<ShInput id="search" placeholder="Search users..." />
+```
+
+##### HtmlFor
+
+`string`
+
+- Alternative to `for` prop (backward compatibility).
+- Same as `for` — associates label with form control ID.
+- `for` takes priority if both are provided.
+
+Usage:
+
+```vue
+<ShLabel htmlFor="name">Name</ShLabel>
+<ShInput id="name" />
+```
+
+#### Requirements:
+
+- Slot content (visible text) required unless `srOnly` is true.
+- Must reference a valid form control ID via `for` or `htmlFor`.
+
 ---
 
-## Props
+### Label with External Association
 
-| **Prop**   | **Type** | **Default** | **Description**               |
-| ---------- | -------- | ----------- | ----------------------------- |
-| `for`      | string   | undefined   | ID of associated form control |
-| `required` | boolean  | false       | Shows required indicator (\*) |
+```vue
+<ShLabel aria-label="Email Address">
+  <ShInput aria-labelledby="external-label" />
+</ShLabel>
+```
+
+- Use when label text is managed elsewhere in the DOM.
+- Reference via `aria-labelledby` on the associated control.
 
 ---
 
-## Accessibility
+### Rule of Thumb:
 
-ShLabel provides explicit form control labeling:
-
-- **Association**
-  - Uses native `<label>` with `for` attribute
-  - Warns when `for` attribute is missing
-  - Automatically associates with control for click activation
-- **Required Indicator**
-  - Adds visual asterisk (\*) when required
-  - Includes `aria-label="required"` on indicator
+- Always pair with a form control (input, textarea, select, etc.).
+- Use `for` to associate with the control's `id`.
+- Use `srOnly` for screen-reader-only labels (e.g., with placeholder).
+- Use `required` to visually mark required fields.
 
 ---
 
 ## Styling Hooks
 
-#### Classes
+### Classes
 
-- `.sh-label` - Label element
-- `.sh-label__required` - Required indicator (\*)
+- `.sh-label` — Applied to the root element always.
 
-#### Data Attributes
+### Data Attributes
 
-```html
-data-required="true"
+| **Attribute**   | **Values** | **Description**                |
+| --------------- | ---------- | ------------------------------ |
+| `data-required` | `true`     | Present when `required` is set |
+
+Example:
+
+```scss
+.sh-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.sh-label[data-required="true"]::after {
+  content: " *";
+  color: red;
+}
 ```
 
 ---
 
-## When to Use ShLabel
+## Dev-time Warnings
 
-- Explicit labeling of form controls
-- When using form components without built-in labels
-- Complex form layouts requiring separate labels
-- Custom form control implementations
+ShLabel warns during development if:
 
-**Note:** Many Shoehorn components (ShInput, ShTextarea, etc.) have built-in label props. Use ShLabel when you need more control over label positioning or styling.
+- No `for` attribute and no `aria-label` provided (label not associated with control).
+- No visible text content and `srOnly` is false (inaccessible label).
+
+Example:
+
+```
+[ShLabel] should have a `for` attribute to associate it with a form control.
+Provide the `for` attribute with the ID of the associated form control.
+```
