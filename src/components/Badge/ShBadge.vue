@@ -1,31 +1,43 @@
 <script setup lang="ts">
 import { computed, onMounted, useAttrs, useSlots } from "vue";
 
-type BadgeVariant = "default" | "success" | "warning" | "error" | "info";
+type badgeVariant = "default" | "success" | "warning" | "error" | "info";
 
 const props = withDefaults(
   defineProps<{
-    variant?: BadgeVariant;
+    variant?: badgeVariant;
     count?: number;
-    label?: string;
+    countCap?: number;
     labelledBy?: string;
+    label?: string;
   }>(),
   {
     variant: "default",
+    count: 0,
+    countCap: 99,
+    labelledBy: undefined,
+    label: undefined,
   },
 );
 
 const attrs = useAttrs();
 const slots = useSlots();
 
-function getDisplayCount() {
-  if (props.count === undefined) return null;
-  return props.count > 99 ? "99+" : props.count.toString();
+const displayCount = computed(() => {
+  if (props.count === undefined) return 0;
+  if (props.countCap !== -1 && props.count > props.countCap) {
+    return `${props.countCap}+`;
+  }
+  return props.count.toString();
+});
+
+function getFallbackDisplayCount(): string | undefined {
+  if (props.count === undefined) return undefined;
+  if (props.count > 99) return `notification count: 99 or more`;
+  return `notification count: ${props.count}`;
 }
 
-const displayCount = computed(getDisplayCount);
-
-function getAttrString(name: string) {
+function getAttrString(name: string): string | undefined {
   const value = attrs[name];
   return typeof value === "string" && value.trim().length > 0
     ? value
@@ -38,18 +50,12 @@ const resolvedAriaLabelledBy = computed(() => {
   return props.labelledBy;
 });
 
-function getFallbackCountLabel() {
-  if (props.count === undefined) return undefined;
-  if (props.count > 99) return "Notification count: 99 or more";
-  return `Notification count: ${props.count}`;
-}
-
 const resolvedAriaLabel = computed(() => {
   const attrLabel = getAttrString("aria-label");
   if (attrLabel) return attrLabel;
   if (resolvedAriaLabelledBy.value) return undefined;
   if (props.label) return props.label;
-  return getFallbackCountLabel();
+  return getFallbackDisplayCount();
 });
 
 onMounted(() => {
@@ -70,7 +76,7 @@ onMounted(() => {
 
     if (!hasAccessibleName) {
       console.warn(
-        "[ShBadge] Badge has no accessible name. " +
+        "[ShBadge] has no accessible name" +
           "Provide text content, `label`, `labelledBy`, `aria-label`, or `aria-labelledby`.",
       );
     }
@@ -81,10 +87,9 @@ onMounted(() => {
 <template>
   <span
     class="sh-badge"
-    :data-variant="variant"
-    :aria-label="resolvedAriaLabel"
+    :data-variant="props.variant"
     :aria-labelledby="resolvedAriaLabelledBy"
-  >
-    <slot>{{ displayCount }}</slot>
+    :aria-label="resolvedAriaLabel"
+    ><slot>{{ displayCount }}</slot>
   </span>
 </template>

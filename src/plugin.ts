@@ -1,5 +1,5 @@
-import type { App } from 'vue';
-import * as components from './components'
+import type { App } from "vue";
+import * as components from "./components";
 
 export default {
   install(app: App) {
@@ -9,5 +9,5 @@ export default {
         app.component(component.name, component);
       }
     }
-  }
+  },
 };

@@ -103,8 +103,8 @@ provide("tabs", {
 
     <div
       v-for="tab in tabs"
-      :key="`${tab.id}-panel`"
       :id="`${tab.id}-panel`"
+      :key="`${tab.id}-panel`"
       role="tabpanel"
       class="sh-tabs__panel"
       :aria-labelledby="tab.id"

@@ -10,51 +10,62 @@ bash
 
 npm install shoehorn-ui
 ```
+
 #### peer dependencies
+
 ShoeHorn UI requires:
+
 - Vue 3 (Composition API)
+
 ```bash
 bash
 
 npm install vue@^3
 ```
----
-## Usage
-#### Import components
-```ts
-typescript
 
-import { ShButton } from 'shoehorn-ui';
+---
+
+## Usage
+
+#### Import components
+
+```ts
+typescript;
+
+import { ShButton } from "shoehorn-ui";
 ```
+
 #### Use in templates
+
 ```vue
 vue
 
 <template>
-  <ShButton @click="onClick">
-    Click Me
-  </ShButton>
+  <ShButton @click="onClick"> Click Me </ShButton>
 </template>
 ```
+
 ---
 
 ## Plugin installation (optional)
 
 You may register all components globally:
+
 ```ts
-typescript
+typescript;
 
-import { createApp } from 'vue';
-import ShoeHornUI from 'shoehorn-ui';
+import { createApp } from "vue";
+import ShoeHornUI from "shoehorn-ui";
 
-createApp(App)
-  .use(ShoeHornUI)
-  .mount('#app')
+createApp(App).use(ShoeHornUI).mount("#app");
 ```
+
 This is completely optional, tree-shaking works better with direct imports.
 
 ---
+
 ## Philosophy
+
 - No forced styles
 - No design tokens
 - No CSS framework assumptions
@@ -62,6 +73,6 @@ This is completely optional, tree-shaking works better with direct imports.
 - Styling is the consumer's responsibility
 
 See:
+
 - [styling.md](./styling.md)
 - [accessibility.md](./accessibility.md)
-

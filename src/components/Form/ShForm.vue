@@ -44,8 +44,8 @@ onMounted(() => {
 
 <template>
   <component
-    ref="formRef"
     :is="as"
+    ref="formRef"
     class="sh-form"
     @submit.prevent="handleSubmit"
   >

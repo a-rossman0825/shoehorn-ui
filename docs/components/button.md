@@ -347,7 +347,6 @@ Usage:
 Example:
 
 ```scss
-
 .sh-button {
   padding: 0.5rem 1rem;
   border: none;

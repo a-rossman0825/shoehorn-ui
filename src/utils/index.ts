@@ -1,2 +1,2 @@
 // intentionally empty
-export {}
+export {};

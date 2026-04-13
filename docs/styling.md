@@ -3,17 +3,19 @@
 ShoeHorn UI is **not a design system**.
 It does not ship colors, spacing, or themes.
 
-Instead, it exposes **stable hooks** so *you* control visuals.
+Instead, it exposes **stable hooks** so _you_ control visuals.
 
 ---
 
 ## How styling works
 
 Each component provides:
+
 - a stable root class (e.g. `.sh-button`)
 - `data-*` attributes that describe state
 
 Example:
+
 ```html
 html
 
@@ -22,13 +24,14 @@ html
   data-variant="primary"
   data-size="md"
   data-disabled="true"
->
+></button>
 ```
 
 ---
 
 ## Styling with CSS/SCSS
-```scss
+
+````scss
 scss
 
 .sh-button {
@@ -70,11 +73,11 @@ css
 [data-theme="dark"] {
   --brand-primary: #60a5fa;
 }
-```
+````
 
 You control:
+
 - light/dark modes
 - branding
 - spacing
 - animation
-

@@ -213,8 +213,8 @@ onMounted(() => {
 
     <ul
       v-show="isOpen"
-      ref="listboxRef"
       id="combobox-listbox"
+      ref="listboxRef"
       role="listbox"
       class="sh-combobox__listbox"
     >
@@ -230,8 +230,8 @@ onMounted(() => {
       <li
         v-for="(option, index) in filteredOptions"
         v-else
-        :key="option.value"
         :id="`option-${index}`"
+        :key="option.value"
         role="option"
         class="sh-combobox__option"
         :class="{
