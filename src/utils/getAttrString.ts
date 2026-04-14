@@ -1,4 +1,3 @@
-
 /**
  * Extracts a string attribute value from attrs.
  * Returns undefined if missing, not a string, or empty after trimming/white-space check

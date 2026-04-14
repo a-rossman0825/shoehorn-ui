@@ -11,7 +11,7 @@ Features:
 - Vue 3 first instead of a React adapted component library.
 - Built for teams that want correctness guaranteed, not just flexibility.
 
-ShoeHorn does not handle style or designs, it only handles behavior and accessibility. 
+ShoeHorn does not handle style or designs, it only handles behavior and accessibility.
 
 ---
 
@@ -58,7 +58,7 @@ const handleSearch = () => {
   <div>
     <!-- Label properly associates with input -->
     <ShLabel for="search">Search users</ShLabel>
-    
+
     <!-- Shows error state with aria-invalid -->
     <ShInput
       id="search"
@@ -67,18 +67,14 @@ const handleSearch = () => {
       :error="error"
       aria-describedby="search-error"
     />
-    
+
     <!-- This would FAIL: iconOnly requires label prop -->
     <!-- <ShButton iconOnly @click="handleSearch">
             <i class="mdi mdi-magnify"></i>
          </ShButton> -->
-    
+
     <!-- This works: explicit label enforces accessibility -->
-    <ShButton 
-      iconOnly 
-      label="Search" 
-      @click="handleSearch"
-    >
+    <ShButton iconOnly label="Search" @click="handleSearch">
       <i class="mdi mdi-magnify"></i>
     </ShButton>
   </div>
@@ -109,6 +105,7 @@ ShoeHorn UI is currently in early development.
 - Components are being added incrementally
 
 ## Roadmap
+
 **Completed:** ShButton, ShLabel, ShBadge
 
 **In Progress:** ShInput, ShCheckbox
@@ -116,12 +113,14 @@ ShoeHorn UI is currently in early development.
 **Planned:** ShDialog, ShTabs, ShCombobox, ShSelect, ShAccordion, ShBreadcrumbs, ShField, ShForm, ShPagination, ShRadioGroup, ShSwitch, ShTextarea, ShTooltip
 
 ## Development
+
 - Built with Vue 3 + TypeScript
 - ESLint + Prettier for code quality
 - Vitest for component unit testing
 - Composables + Utils for code reuse
 
 ## Type Safety
+
 - Discriminated unions enforce correct prop usage at compile time, for example:
 
 - Using `as="a"` on a [ShButton] requires `href`
@@ -133,6 +132,7 @@ See [Contributing Guide](./CONTRIBUTING.md) for development setup.
 ---
 
 # Browser Support
+
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+
@@ -140,7 +140,9 @@ See [Contributing Guide](./CONTRIBUTING.md) for development setup.
 ---
 
 # Testing
+
 All components have:
+
 - Unit tests (Vitest)
 - Accessibility tests
 - v-model/emit tests

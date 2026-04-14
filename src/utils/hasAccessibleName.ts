@@ -1,6 +1,5 @@
-
 /**
- * 
+ *
  * @param ariaLabel - The aria-label value (if present)
  * @param ariaLabelledBy - The aria-labelledby value (if present)
  * @param hasSlotText - wWhether slot contains text (boolean)

@@ -1,2 +1,2 @@
 export * from "./useFocus";
-export * from "./useSlotText";
+export * from "./useHasSlotText";
