@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, useAttrs } from "vue";
-import { useHasSlotText } from "../../composables/useSlotText";
+import { useHasSlotText } from "../../composables/useHasSlotText";
 import { getAttrString } from "../../utils";
 import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
@@ -10,6 +10,17 @@ const props = withDefaults(
   defineProps<{
     variant?: badgeVariant;
     count?: number;
+    /**
+     * Maximum count to display before showing overflow indicator.
+     * Set to -1 to disable the cap and display the full count.
+     * @default 99
+     * @example
+     * // Shows "99+" for counts > 99:
+     * <ShBadge :count="150" :countCap="99" />
+     *
+     * // Shows full count:
+     * <ShBadge :count="150" :countCap="-1" />
+     */
     countCap?: number;
     labelledBy?: string;
     label?: string;
@@ -79,7 +90,6 @@ const hasSlotText = useHasSlotText();
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
-
     const slotHasText = hasSlotText();
     /* NOTE - refactor: use "hasAccessibleName()" util instead.
     const hasAccessibleName =

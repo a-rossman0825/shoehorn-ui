@@ -9,13 +9,40 @@ type ButtonType = "button" | "submit" | "reset";
 type ButtonVariant = "default" | "primary" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 
+/**
+ * ShButton uses discriminated unions to enforce prop contracts:
+ *
+ * ElementProps: `as` determines the element type
+ *   - as="button" (default): renders <button>, href not allowed
+ *   - as="a": renders <a>, href is REQUIRED
+ *
+ * AccessibilityProps: `iconOnly` determines if label is required
+ *   - iconOnly=true: label MUST be provided (icon-only button)
+ *   - iconOnly=false/undefined (default): label is optional
+ *
+ * This prevents impossible prop combinations at compile time.
+ * See docs/components/button.md for usage examples.
+ */
+
 type ButtonElementProps =
-  | { as?: "button"; href?: never }
-  | { as: "a"; href: string };
+  | {
+      as?: "button";
+      href?: never;
+    }
+  | {
+      as: "a";
+      href: string;
+    };
 
 type ButtonAccessibilityProps =
-  | { iconOnly: true; label: string }
-  | { iconOnly?: false; label?: string };
+  | {
+      iconOnly: true;
+      label: string;
+    }
+  | {
+      iconOnly?: false;
+      label?: string;
+    };
 
 type ButtonProps = ButtonElementProps &
   ButtonAccessibilityProps & {
@@ -92,7 +119,6 @@ const slotHasText = useHasSlotText();
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
-    
     const hasSlotText = slotHasText();
 
     if (props.as === "a" && !props.href) {

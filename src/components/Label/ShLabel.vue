@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, useAttrs } from "vue";
-import { useHasSlotText } from "../../composables/useSlotText";
+import { useHasSlotText } from "../../composables/useHasSlotText";
 import { getAttrString } from "../../utils";
 import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
