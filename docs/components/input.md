@@ -143,7 +143,7 @@ Usage:
   id="password"
   v-model="password"
   description="At least 8 characters, one uppercase, one number"
-/>
+></ShInput>
 ```
 
 #### Requirements:
