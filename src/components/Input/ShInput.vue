@@ -43,17 +43,32 @@ const handleInput = (event: Event) => {
 
 const ariaInvalid = computed(() => Boolean(props.error));
 
-const ariaDescribedBy = computed(() => {
+const ariaDescribedBy = computed(():string | undefined => {
   if (props.error) {
-    return "input-error";
+    return errorId.value;
   } else if (props.description){
-    return "input-description";
+    return descriptionId.value;
   } else {
     return undefined;
   }
 });
 
 const attrs = useAttrs() as Record<string, unknown>;
+
+//NOTE - auto-generated fallback IDs
+const inputId = computed(():string => {
+  if (props.id) return props.id;
+  const generatedId = Math.random().toString(36).slice(2);
+  return `Sh-Input-${generatedId}`;
+});
+
+const errorId = computed((): string | undefined => {
+  return props.error ? `${inputId.value}-error` : undefined;
+});
+
+const descriptionId = computed((): string | undefined => {
+  return props.description ? `${inputId.value}-description` : undefined;
+})
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production"){
@@ -77,7 +92,7 @@ onMounted(() => {
 <template>
   <div class="input-wrapper">
     <input
-      :id="id"
+      :id="inputId"
       class="sh-input"
       :name="name"
       :value="modelValue"
@@ -91,7 +106,7 @@ onMounted(() => {
       data-testid="sh-input-test-id"
       @input="handleInput"
     />
-    <p v-if="error" id="input-error" data-testid="sh-input-error">{{ error }}</p>
-    <p v-if="description" id="input-description" data-testid="sh-input-description">{{ description }}</p>
+    <p v-if="error" :id="errorId" data-testid="sh-input-error">{{ error }}</p>
+    <p v-if="description" :id="descriptionId" data-testid="sh-input-description">{{ description }}</p>
   </div>
 </template>
