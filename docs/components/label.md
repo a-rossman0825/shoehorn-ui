@@ -98,6 +98,7 @@ Usage:
 ### Classes
 
 - `.sh-label` — Applied to the root element always.
+- `.sh-label--sr-only` — Applied when `srOnly` is true (screen reader only).
 
 ### Data Attributes
 
@@ -117,6 +118,18 @@ Example:
 .sh-label[data-required="true"]::after {
   content: " *";
   color: red;
+}
+
+.sh-label--sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 ```
 

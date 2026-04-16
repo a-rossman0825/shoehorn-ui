@@ -303,8 +303,10 @@ Usage:
 
 ### Classes
 
-- `.sh-input` — Applied to the `<input>` element always.
-- `.input-wrapper` — Applied to the wrapper `<div>`.
+- `.sh-input` — Applied to the wrapper `<div>` always.
+- `.sh-input__control` — Applied to the `<input>` element.
+- `.sh-input__error` — Applied to error message element.
+- `.sh-input__description` — Applied to description element.
 
 ### Data Attributes
 
@@ -316,33 +318,37 @@ Example:
 
 ```scss
 .sh-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sh-input__control {
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
 }
 
-.sh-input[data-error] {
+.sh-input__control[data-error] {
   border-color: #ef4444;
   background-color: #fef2f2;
 }
 
-.sh-input:focus {
+.sh-input__control:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-#input-error {
+.sh-input__error {
   color: #ef4444;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
 }
 
-#input-description {
+.sh-input__description {
   color: #666;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
 }
 ```
 
