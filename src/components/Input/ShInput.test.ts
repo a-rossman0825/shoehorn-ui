@@ -115,14 +115,16 @@ describe(ShInput, () => {
     const wrapper = mount(ShInput, {
       props: { error: "test-error" },
     });
-    expect(wrapper.find("input").attributes("aria-describedby")).toBe("input-error");
+    const errorId = wrapper.find('[data-testid="sh-input-error"]').attributes("id");
+    expect(wrapper.find("input").attributes("aria-describedby")).toBe(errorId);
   });
 
   it("sets aria-describedby to 'input-description' when only description exists", () => {
     const wrapper = mount(ShInput, {
       props: { description: "test-description" },
     });
-    expect(wrapper.find("input").attributes("aria-describedby")).toBe("input-description");
+    const descriptionId = wrapper.find('[data-testid="sh-input-description"]').attributes("id");
+    expect(wrapper.find("input").attributes("aria-describedby")).toBe(descriptionId);
   });
 
   it("does not set aria-describedby when neither error nor description exist", () => {
@@ -152,6 +154,47 @@ describe(ShInput, () => {
       props: { name: "test-name" },
     });
     expect(wrapper.find("input").attributes("name")).toBe("test-name");
+  });
+
+  it("prioritizes error over description in aria-describedby when both exist", () => {
+    const wrapper = mount(ShInput, {
+      props: { error: "test error", description: "test description" }
+    });
+    const errorId = wrapper.find('[data-testid="sh-input-error"]').attributes("id");
+    expect (wrapper.find("input").attributes("aria-describedby")).toBe(errorId);
+  })
+
+  it("generates consistent error IDs when no id prop is provided", () => {
+    const wrapper1 = mount(ShInput, { props: { error: "test error 1" } });
+    const wrapper2 = mount(ShInput, { props: { error: "test error 2" } });
+
+    const id1 = wrapper1.find("input").attributes("id");
+    const id2 = wrapper2.find("input").attributes("id");
+
+    expect(id1).not.toBe(id2);
+    expect(wrapper1.find('[data-testid="sh-input-error"]').attributes("id")).toContain(id1);
+  });
+
+  it("does not render error element when error is an empty string", () => {
+    const wrapper = mount(ShInput, { props: { error: ""} });
+    expect(wrapper.find('[data-testid="sh-input-error"]').exists()).toBe(false);
+  });
+
+  it("updates aria-describedby when error prop changes", async () => {
+    const wrapper = mount(ShInput, { props: { error: "test error 1"} });
+    const initialId = wrapper.find("input").attributes("aria-describedby");
+
+    await wrapper.setProps({ error: "test error 2" });
+    const updatedId = wrapper.find("input").attributes("aria-describedby");
+
+    expect(updatedId).toBe(initialId);
+  });
+
+  it("warns if no id and no aria-label/aria-labelledby in dev", () => {
+    const consoleWarning = vi.spyOn(console, "warn");
+    mount(ShInput);
+    expect(consoleWarning).toHaveBeenCalled();
+    expect(consoleWarning.mock.calls[0][0]).toContain("aria-label");
   });
 
 });
