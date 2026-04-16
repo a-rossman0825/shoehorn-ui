@@ -54,19 +54,3 @@
   margin-top: 0.25rem;
   display: block;
 }
-
-/* NOTE: error message styling */
-.sh-input__error {
-  color: var(--color-error, #dc2626);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-/* NOTE: description/helper text styling */
-.sh-input__description {
-  color: var(--color-text-secondary, #666);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}

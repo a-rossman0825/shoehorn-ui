@@ -24,3 +24,10 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+// NOTE: default asterisk for required="true" attribute
+.sh-label[data-required="true"]::after {
+  content: " *";
+  color: var(--color-error, #dc2626);
+  font-weight: 500;
+}
