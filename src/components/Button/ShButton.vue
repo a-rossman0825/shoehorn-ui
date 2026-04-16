@@ -2,7 +2,7 @@
 /* eslint-disable vue/require-default-prop, vue/no-required-prop-with-default */
 import { computed, onMounted, useAttrs } from "vue";
 import { getAttrString } from "../../utils";
-import { useHasSlotText } from "../../composables";
+import { useHasSlotText, useResolvedAriaAttr } from "../../composables";
 import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
 type ButtonType = "button" | "submit" | "reset";
@@ -79,11 +79,7 @@ function getAttrString(name: string) {
 }
     */
 
-const resolvedAriaLabelledBy = computed(() => {
-  const attrLabelledBy = getAttrString(attrs, "aria-labelledby");
-  if (attrLabelledBy) return attrLabelledBy;
-  return props.labelledBy;
-});
+const resolvedAriaLabelledBy = useResolvedAriaAttr(attrs, "aria-labelledby", props.labelledBy);
 
 const resolvedAriaLabel = computed(() => {
   const attrLabel = getAttrString(attrs, "aria-label");

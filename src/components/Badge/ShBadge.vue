@@ -3,6 +3,7 @@ import { computed, onMounted, useAttrs } from "vue";
 import { useHasSlotText } from "../../composables/useHasSlotText";
 import { getAttrString } from "../../utils";
 import { hasAccessibleName } from "../../utils/hasAccessibleName";
+import { useResolvedAriaAttr } from "../../composables";
 
 type badgeVariant = "default" | "success" | "warning" | "error" | "info";
 
@@ -58,12 +59,8 @@ function getFallbackDisplayCount(): string | undefined {
       : undefined;
   }
 */
-
-const resolvedAriaLabelledBy = computed(() => {
-  const attrLabelledBy = getAttrString(attrs, "aria-labelledby");
-  if (attrLabelledBy) return attrLabelledBy;
-  return props.labelledBy;
-});
+/* NOTE - refactor: uses "useResolvedAriaAttr" composable instead */
+const resolvedAriaLabelledBy = useResolvedAriaAttr(attrs, "aria-labelledby", props.labelledBy);
 
 const resolvedAriaLabel = computed(() => {
   const attrLabel = getAttrString(attrs, "aria-label");
