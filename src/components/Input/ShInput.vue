@@ -16,6 +16,11 @@ const props = withDefaults(
     readonly?: boolean;
     error?: string;
     description?: string;
+    minlength?: number;
+    maxlength?: number;
+    pattern?: string;
+    required?: boolean;
+    autocomplete?: string;
   }>(),
   {
     type: "text",
@@ -27,6 +32,11 @@ const props = withDefaults(
     readonly: false,
     error: undefined,
     description: undefined,
+    minlength: 0,
+    maxlength: undefined,
+    pattern: undefined,
+    required: false,
+    autocomplete: undefined,
   },
 );
 
@@ -70,6 +80,7 @@ const descriptionId = computed((): string | undefined => {
   return props.description ? `${inputId.value}-description` : undefined;
 });
 
+
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
     const ariaLabel = getAttrString(attrs, "aria-label");
@@ -82,7 +93,7 @@ onMounted(() => {
         "[ShInput] should have one of: `id` to (associate with external label), " +
           "`aria-label`, or `aria-labelledby",
       );
-    }
+    };
   }
 });
 </script>
@@ -102,6 +113,11 @@ onMounted(() => {
       :aria-invalid="ariaInvalid"
       :aria-describedby="ariaDescribedBy"
       data-testid="sh-input-test-id"
+      :minlength="minlength"
+      :maxlength="maxlength"
+      :pattern="pattern"
+      :required="required"
+      :autocomplete="autocomplete"
       @input="handleInput"
     />
     <p
