@@ -11,3 +11,16 @@
   color: var(--color-error, #dc2626);
   margin-left: 0.25rem;
 }
+
+// NOTE: screen reader only modifier
+.sh-label--sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

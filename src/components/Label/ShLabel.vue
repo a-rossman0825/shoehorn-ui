@@ -64,7 +64,7 @@ onMounted(() => {
     class="sh-label"
     :for="resolvedFor"
     :data-required="required || undefined"
-    :class="{ 'sr-only': srOnly }"
+    :class="{ 'sh-label--sr-only': srOnly }"
   >
     <slot></slot>
   </label>
