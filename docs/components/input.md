@@ -216,7 +216,7 @@ function validateEmail() {
   v-model="password"
   type="password"
   description="At least 8 characters, one uppercase, one number"
-/>
+></ShInput>
 ```
 
 #### What renders:
@@ -239,7 +239,7 @@ function validateEmail() {
   type="password"
   :error="passwordError"
   description="At least 8 characters"
-/>
+></ShInput>
 ```
 
 #### Priority logic:
@@ -350,6 +350,49 @@ Example:
   color: #666;
   font-size: 0.875rem;
 }
+```
+
+---
+
+## Accessibility Requirements
+
+### Required Field Visual Indicators
+
+When using `required={true}`, you **must** provide a visual indicator (asterisk, bold text, color, etc.). This is a WCAG 3.2.2 requirement - screen reader users see `aria-required="true"`, but sighted users need a visual cue too.
+
+#### Using `<ShLabel required>`
+
+Pair with `<ShLabel>` and use the `required` prop:
+
+```vue
+<ShLabel for="password" required>Password</ShLabel>
+<ShInput id="password" v-model="password" required type="password" />
+```
+
+The `<ShLabel>` component renders `data-required="true"` on the element, and the default CSS automatically adds a red asterisk (`*`) after the label text.
+
+**To customize the asterisk styling**, override the CSS:
+
+```scss
+.sh-label[data-required="true"]::after {
+  content: " *";
+  color: orange;  /* change color */
+  font-weight: bold;  /* adjust weight */
+  /* or use a different indicator */
+  /* content: " (required)"; */
+}
+```
+
+#### Custom Approaches
+
+If not using `<ShLabel>`, add a visual indicator in your own markup:
+
+```vue
+<label for="email">
+  Email
+  <span aria-label="required" style="color: red;">*</span>
+</label>
+<ShInput id="email" v-model="email" required type="email" />
 ```
 
 ---
