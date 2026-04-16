@@ -197,4 +197,53 @@ describe(ShInput, () => {
     expect(consoleWarning.mock.calls[0][0]).toContain("aria-label");
   });
 
+  it("binds minlength attribute to input element", () => {
+    const wrapper = mount(ShInput, {
+      props: { minlength: 2 }
+    });
+    expect(wrapper.find("input").attributes("minlength")).toBe("2");
+  });
+
+  it("binds maxlength attr to input element", () => {
+    const wrapper = mount(ShInput, {
+      props: { maxlength: 25 }
+    });
+    expect(wrapper.find("input").attributes("maxlength")).toBe("25");
+  });
+
+  it("binds pattern attribute to input element", () => {
+    const wrapper = mount(ShInput, {
+      props: { pattern: "email" }
+    });
+    expect(wrapper.find("input").attributes("pattern")).toBe("email");
+  });
+
+  it("binds required attribute to input element", () => {
+    const wrapper = mount(ShInput, {
+      props: { required: true }
+    });
+    expect(wrapper.find("input").attributes("required")).toBeDefined();
+  });
+
+  it("binds autocomplete attr to input element", () => {
+    const wrapper = mount(ShInput, {
+      props: { autocomplete: "email" }
+    });
+    expect(wrapper.find("input").attributes("autocomplete")).toBeDefined();
+  });
+
+  it("autocomplete='email' on email type input", () => {
+    const wrapper = mount(ShInput, {
+      props: { autocomplete: "email" }
+    });
+    expect(wrapper.find("input").attributes("autocomplete")).toBe("email");
+  });
+
+  it("autocomplete='tel' on tel type input", () => {
+    const wrapper = mount(ShInput, {
+      props: { autocomplete: "tel" }
+    });
+    expect(wrapper.find("input").attributes("autocomplete")).toBe("tel");
+  });
+
 });
