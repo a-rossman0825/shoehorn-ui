@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from 'vue';
-import { getAttrString } from '../../utils';
-import { hasAccessibleName } from '../../utils/hasAccessibleName';
+import { computed, onMounted, useAttrs } from "vue";
+import { getAttrString } from "../../utils";
+import { hasAccessibleName } from "../../utils/hasAccessibleName";
 
 type inputType = "text" | "email" | "password" | "search" | "url" | "tel";
 
@@ -43,10 +43,10 @@ const handleInput = (event: Event) => {
 
 const ariaInvalid = computed(() => Boolean(props.error));
 
-const ariaDescribedBy = computed(():string | undefined => {
+const ariaDescribedBy = computed((): string | undefined => {
   if (props.error) {
     return errorId.value;
-  } else if (props.description){
+  } else if (props.description) {
     return descriptionId.value;
   } else {
     return undefined;
@@ -56,7 +56,7 @@ const ariaDescribedBy = computed(():string | undefined => {
 const attrs = useAttrs() as Record<string, unknown>;
 
 //NOTE - auto-generated fallback IDs
-const inputId = computed(():string => {
+const inputId = computed((): string => {
   if (props.id) return props.id;
   const generatedId = Math.random().toString(36).slice(2);
   return `Sh-Input-${generatedId}`;
@@ -68,32 +68,30 @@ const errorId = computed((): string | undefined => {
 
 const descriptionId = computed((): string | undefined => {
   return props.description ? `${inputId.value}-description` : undefined;
-})
+});
 
 onMounted(() => {
-  if (process.env.NODE_ENV !== "production"){
-    const ariaLabel = getAttrString(attrs, 'aria-label');
-    const ariaLabelledBy = getAttrString(attrs, 'aria-labelledby');
+  if (process.env.NODE_ENV !== "production") {
+    const ariaLabel = getAttrString(attrs, "aria-label");
+    const ariaLabelledBy = getAttrString(attrs, "aria-labelledby");
 
-    const accessible = hasAccessibleName(ariaLabel, ariaLabelledBy, false)
+    const accessible = hasAccessibleName(ariaLabel, ariaLabelledBy, false);
 
     if (!props.id && !accessible) {
       console.warn(
         "[ShInput] should have one of: `id` to (associate with external label), " +
-        "`aria-label`, or `aria-labelledby"
-      )
+          "`aria-label`, or `aria-labelledby",
+      );
     }
   }
-})
-
-
+});
 </script>
 
 <template>
-  <div class="input-wrapper">
+  <div class="sh-input">
     <input
       :id="inputId"
-      class="sh-input"
+      class="sh-input__control"
       :name="name"
       :value="modelValue"
       :type="type"
@@ -106,7 +104,22 @@ onMounted(() => {
       data-testid="sh-input-test-id"
       @input="handleInput"
     />
-    <p v-if="error" :id="errorId" data-testid="sh-input-error">{{ error }}</p>
-    <p v-if="description" :id="descriptionId" data-testid="sh-input-description">{{ description }}</p>
+    <p
+      v-if="error"
+      :id="errorId"
+      class="sh-input__error"
+      data-testid="sh-input-error"
+      role="alert"
+    >
+      {{ error }}
+    </p>
+    <p
+      v-if="description"
+      :id="descriptionId"
+      class="sh-input__description"
+      data-testid="sh-input-description"
+    >
+      {{ description }}
+    </p>
   </div>
 </template>
