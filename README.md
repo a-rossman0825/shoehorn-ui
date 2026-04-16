@@ -94,6 +94,7 @@ Full documentation lives in the [/docs folder](https://github.com/a-rossman0825/
   - [ShBadge](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/badge.md)
   - [ShButton](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/button.md)
   - [ShLabel](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/label.md)
+  - [ShInput](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/input.md)
 
 ---
 
