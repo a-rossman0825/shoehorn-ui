@@ -1,27 +1,22 @@
-import { ref } from "vue";
+import { Ref, ref } from "vue";
 
-export function useFocus<T extends HTMLElement = HTMLElement>() {
-  // NOTE - One shared focus state across all components.
+
+
+export function useFocus<T extends HTMLElement = HTMLElement>(){
   const isFocused = ref(false);
-  const elementRef = ref<T>();
+  const elementRef: Ref<T | null> = ref(null);
 
-  // NOTE - Expose focus controls so parent flows can move focus when needed.
-  function focus() {
-    elementRef.value?.focus();
-  }
+  const focus = () => elementRef.value?.focus();
+  const blur = () => elementRef.value?.blur();
+  const onFocus = () => (isFocused.value = true);
+  const onBlur = () => (isFocused.value = false);
 
-  function blur() {
-    elementRef.value?.blur();
-  }
-
-  // NOTE - Keep these handlers here so each component doesn't rewrite them.
-  function onFocus() {
-    isFocused.value = true;
-  }
-
-  function onBlur() {
-    isFocused.value = false;
-  }
-
-  return { isFocused, elementRef, focus, blur, onFocus, onBlur };
+  return {
+    isFocused,
+    elementRef,
+    focus,
+    blur,
+    onFocus,
+    onBlur,
+  };
 }
