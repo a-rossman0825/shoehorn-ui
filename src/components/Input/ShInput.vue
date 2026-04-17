@@ -2,6 +2,7 @@
 import { computed, onMounted, useAttrs } from "vue";
 import { getAttrString } from "../../utils";
 import { hasAccessibleName } from "../../utils/hasAccessibleName";
+import { useFocus } from "../../composables";
 
 type inputType = "text" | "email" | "password" | "search" | "url" | "tel";
 
@@ -40,8 +41,12 @@ const props = withDefaults(
   },
 );
 
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } = useFocus<HTMLInputElement>();
+
 const emit = defineEmits<{
   "update:modelValue": [value: string];
+  focus: [event: FocusEvent];
+  blur: [event: FocusEvent];
 }>();
 
 const handleInput = (event: Event) => {
@@ -50,6 +55,17 @@ const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   emit("update:modelValue", target.value);
 };
+
+const handleFocus = (event: FocusEvent) => {
+  onFocus();
+  emit("focus", event);
+};
+
+const handleBlur = (event: FocusEvent) => {
+  onBlur();
+  emit("blur", event);
+};
+
 
 const ariaInvalid = computed(() => Boolean(props.error));
 
@@ -80,6 +96,14 @@ const descriptionId = computed((): string | undefined => {
   return props.description ? `${inputId.value}-description` : undefined;
 });
 
+//NOTE - checks current state and returns a string
+const dataState = computed((): string => {
+  if (props.disabled) return "disabled";
+  if (props.error) return "invalid";
+  if (isFocused.value) return "focused";
+  return "idle";
+});
+
 
 onMounted(() => {
   if (process.env.NODE_ENV !== "production") {
@@ -102,6 +126,7 @@ onMounted(() => {
   <div class="sh-input">
     <input
       :id="inputId"
+      ref="elementRef"
       class="sh-input__control"
       :name="name"
       :value="modelValue"
@@ -119,6 +144,8 @@ onMounted(() => {
       :required="required"
       :autocomplete="autocomplete"
       @input="handleInput"
+      @focus="handleFocus"
+      @blur = "handleBlur"
     />
     <p
       v-if="error"
