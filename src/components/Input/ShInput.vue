@@ -120,6 +120,13 @@ onMounted(() => {
     };
   }
 });
+
+defineExpose({
+  focus,
+  blur,
+  select: () => elementRef.value?.select()
+});
+
 </script>
 
 <template>
@@ -143,6 +150,7 @@ onMounted(() => {
       :pattern="pattern"
       :required="required"
       :autocomplete="autocomplete"
+      :data-state="dataState"
       @input="handleInput"
       @focus="handleFocus"
       @blur = "handleBlur"
