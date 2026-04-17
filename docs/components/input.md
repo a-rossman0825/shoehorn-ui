@@ -310,9 +310,10 @@ Usage:
 
 ### Data Attributes
 
-| **Attribute** | **Values** | **Description**           |
-| ------------- | ---------- | ------------------------- |
-| `data-error`  | string     | Present when error exists |
+| **Attribute** | **Values**                                     | **Description**                 |
+| ------------- | ---------------------------------------------- | ------------------------------- |
+| `data-error`  | string                                         | Present when error exists       |
+| `data-state`  | "idle" \| "focused" \| "invalid" \| "disabled" | Current input state for styling |
 
 Example:
 
@@ -330,17 +331,24 @@ Example:
   font-size: 1rem;
 }
 
-.sh-input__control[data-error] {
-  border-color: #ef4444;
-  background-color: #fef2f2;
-}
-
-.sh-input__control:focus {
+/* State-based styling */
+.sh-input__control[data-state="focused"] {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.sh-input__control[data-state="invalid"] {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.sh-input__control[data-state="disabled"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error and description styling */
 .sh-input__error {
   color: #ef4444;
   font-size: 0.875rem;
@@ -376,8 +384,8 @@ The `<ShLabel>` component renders `data-required="true"` on the element, and the
 ```scss
 .sh-label[data-required="true"]::after {
   content: " *";
-  color: orange;  /* change color */
-  font-weight: bold;  /* adjust weight */
+  color: orange; /* change color */
+  font-weight: bold; /* adjust weight */
   /* or use a different indicator */
   /* content: " (required)"; */
 }
