@@ -246,4 +246,74 @@ describe(ShInput, () => {
     expect(wrapper.find("input").attributes("autocomplete")).toBe("tel");
   });
 
+  it("emits focus event when input receives focus", async () => {
+    const wrapper = mount(ShInput);
+    const input = wrapper.find("input");
+
+    await input.trigger("focus");
+    const event = wrapper.emitted("focus");
+    if (!event) throw new Error("event does not exist/is falsy");
+    expect(event.length).toBe(1);
+  });
+
+  it("emits blur event when input loses focus", async () => {
+    const wrapper = mount(ShInput);
+    const input = wrapper.find("input");
+
+    await input.trigger("focus");
+    await input.trigger("blur");
+    const event = wrapper.emitted("blur");
+    if (!event) throw new Error("blur event does not exist");
+    expect(event.length).toBe(1);
+  });
+
+  it("updates the data-state to 'focused'", async () => {
+    const wrapper = mount(ShInput);
+    const input = wrapper.find("input");
+
+    await input.trigger("focus");
+
+    expect(input.attributes("data-state")).toBe("focused");
+  });
+
+  it("updates data-state to 'idle' when input is blurred", async () => {
+    const wrapper = mount(ShInput);
+    const input = wrapper.find("input");
+
+    await input.trigger("blur");
+
+    expect(input.attributes("data-state")).toBe("idle");
+
+  });
+
+  it("data-state is 'invalid' when error prop exists");
+
+  it("data-state is 'disabled' when disabled prop is true");
+
+  it("data-state priority: disabled > invalid > focused > idle");
+
+  it("exposes focus() method to parent via ref");
+
+  it("exposes blur() method to parent via ref");
+
+  it("exposes select() method to parent via ref");
+
+  it("focus() method sets focus on the input element");
+
+  it("blur() method removes focus from the input element");
+
+  it("select() method selects all text in the input");
+
 });
+
+
+  // it("emits the correct value from the input", async () => {
+  //   const wrapper = mount(ShInput);
+  //   const input = wrapper.find("input");
+
+  //   await input.setValue("test@testing.com");
+  //   expect(wrapper.emitted("update:modelValue")).toBeTruthy();
+  //   expect(wrapper.emitted("update:modelValue")![0]).toEqual([
+  //     "test@testing.com",
+  //   ]);
+  // });
