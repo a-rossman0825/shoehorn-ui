@@ -23,7 +23,7 @@ A native `<label>` element that associates with a form control via the `for` att
 
 `true` | `false`
 
-- Adds visual indicator (styling hook via `data-required`).
+- Adds `data-required="true"` and uses the default CSS to render an asterisk (`*`) after the label text.
 - Defaults to `false` if not specified.
 
 Usage:

@@ -166,9 +166,13 @@ Usage:
 #### What renders:
 
 ```html
-<div class="input-wrapper">
-  <input aria-invalid="true" aria-describedby="input-error" />
-  <p id="input-error">Invalid email format</p>
+<div class="sh-input">
+  <input
+    class="sh-input__control"
+    aria-invalid="true"
+    aria-describedby="input-error"
+  />
+  <p id="input-error" class="sh-input__error">Invalid email format</p>
 </div>
 ```
 
@@ -222,9 +226,11 @@ function validateEmail() {
 #### What renders:
 
 ```html
-<div class="input-wrapper">
-  <input aria-describedby="input-description" />
-  <p id="input-description">At least 8 characters, one uppercase, one number</p>
+<div class="sh-input">
+  <input class="sh-input__control" aria-describedby="input-description" />
+  <p id="input-description" class="sh-input__description">
+    At least 8 characters, one uppercase, one number
+  </p>
 </div>
 ```
 
@@ -287,14 +293,20 @@ When user types, `update:modelValue` event is emitted with the new value. Parent
 
 ## Events
 
-| **Event**           | **Payload** | **Description**                                   |
-| ------------------- | ----------- | ------------------------------------------------- |
-| `update:modelValue` | `string`    | Emitted when user types (not emitted if disabled) |
+| **Event**           | **Payload**  | **Description**                                   |
+| ------------------- | ------------ | ------------------------------------------------- |
+| `update:modelValue` | `string`     | Emitted when user types (not emitted if disabled) |
+| `focus`             | `FocusEvent` | Emitted when the input receives focus             |
+| `blur`              | `FocusEvent` | Emitted when the input loses focus                |
 
 Usage:
 
 ```vue
-<ShInput v-model="name" @update:modelValue="handleChange" />
+<ShInput
+  v-model="name"
+  @update:modelValue="handleChange"
+  @blur="validateName"
+/>
 ```
 
 ---
