@@ -1,157 +1,118 @@
 # ShoeHorn UI
 
-**ShoeHorn UI** is an accessibility-first, design-agnostic component library for Vue 3 + TypeScript.
+ShoeHorn UI is an accessibility-first, design-agnostic component library for Vue 3 and TypeScript. It owns semantics, keyboard and focus behavior, form integration, accessible state, and minimal structural styling while leaving visual identity to the consuming application.
 
-Features:
+ShoeHorn UI is designed and tested to support WCAG 2.2 Level AA conformance when its components are used according to their documented contracts. WCAG conformance applies to complete pages, so application content, structure, color choices, and integration remain consumer responsibilities.
 
-- Accessibility as a feature (no more fighting lighthouse over Aria).
-- Enforces correct prop usage (eg: no anchor without href).
-- Dev-time warnings whenever prop/attrs are incorrect (eg: no label on icon-only buttons).
-- Fails loudly to ensure inaccessible components are never shipped.
-- Vue 3 first instead of a React adapted component library.
-- Built for teams that want correctness guaranteed, not just flexibility.
+## Features
 
-ShoeHorn does not handle style or designs, it only handles behavior and accessibility.
+- Native HTML semantics whenever a native element satisfies the interaction.
+- Type-safe prop contracts for invalid combinations that can be caught statically.
+- Development warnings for runtime accessibility problems.
+- SSR-safe IDs and instance-safe ARIA relationships.
+- Native form submission, validation, reset, and attribute forwarding.
+- Keyboard and focus behavior for composite widgets.
+- Automated interaction and axe accessibility tests.
+- Design-agnostic BEM classes, state attributes, and CSS custom properties.
+- Reduced-motion, forced-colors, RTL-friendly, zoom, and reflow considerations.
 
----
-
-# Installation
+## Installation
 
 ```bash
-bash
-
 npm install shoehorn-ui
 ```
 
-## Peer Dependency
+Vue 3.4 or newer is required as a peer dependency.
 
-```bash
-bash
+```ts
+import { createApp } from "vue";
+import { ShoeHornUI } from "shoehorn-ui";
+import "shoehorn-ui/style.css";
 
-npm install vue@^3
+createApp(App).use(ShoeHornUI).mount("#app");
 ```
 
----
-
-# Usage
+Components can also be imported individually for tree shaking:
 
 ```vue
-vue
-
 <script setup lang="ts">
 import { ref } from "vue";
-import { ShLabel, ShInput, ShButton } from "shoehorn-ui";
+import { ShButton, ShField, ShInput } from "shoehorn-ui";
 
-const query = ref("");
+const name = ref("");
 const error = ref("");
 
-const handleSearch = () => {
-  if (!query.value) {
-    error.value = "Search term required";
-    return;
-  }
-  console.log("Searching for:", query.value);
-};
+function save() {
+  error.value = name.value.trim() ? "" : "Enter your name";
+}
 </script>
 
 <template>
-  <div>
-    <!-- Label properly associates with input -->
-    <ShLabel for="search">Search users</ShLabel>
-
-    <!-- Shows error state with aria-invalid -->
-    <ShInput
-      id="search"
-      v-model="query"
-      placeholder="Type a name..."
-      :error="error"
-      aria-describedby="search-error"
-    />
-
-    <!-- This would FAIL: iconOnly requires label prop -->
-    <!-- <ShButton iconOnly @click="handleSearch">
-            <i class="mdi mdi-magnify"></i>
-         </ShButton> -->
-
-    <!-- This works: explicit label enforces accessibility -->
-    <ShButton iconOnly label="Search" @click="handleSearch">
-      <i class="mdi mdi-magnify"></i>
-    </ShButton>
-  </div>
+  <ShField
+    id="display-name"
+    label="Display name"
+    description="Shown on your public profile"
+    :error="error"
+    required
+  >
+    <ShInput v-model="name" name="displayName" autocomplete="name" />
+  </ShField>
+  <ShButton @click="save">Save profile</ShButton>
 </template>
 ```
 
----
+## Components
 
-# Documentation
+### Forms
 
-Full documentation lives in the [/docs folder](https://github.com/a-rossman0825/shoehorn-ui/tree/main/docs):
+- Button and navigation-link mode
+- Field, Label, Input, Textarea, Select
+- Checkbox, Switch, RadioGroup
+- Combobox and Form
 
-- [Getting Started](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/getting-started.md)
-- [Styling Guide](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/styling.md)
-- [Accessibility](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/accessibility.md)
-- Components
-  - [ShBadge](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/badge.md)
-  - [ShButton](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/button.md)
-  - [ShLabel](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/label.md)
-  - [ShInput](https://github.com/a-rossman0825/shoehorn-ui/blob/main/docs/components/input.md)
+### Navigation and disclosure
 
----
+- Accordion, Breadcrumbs, Pagination, Tabs
+- Dialog and Tooltip
 
-# Build Status
+### Status and utility
 
-ShoeHorn UI is currently in early development.
+- Alert, Badge, Progress, Spinner, VisuallyHidden
 
-- APIs will evolve
-- Components are being added incrementally
+All components and reusable option types are exported from the package root.
 
-## Roadmap
+## Accessibility approach
 
-**Completed:** ShButton, ShLabel, ShBadge
+- Native controls retain their built-in keyboard and form behavior.
+- Composite widgets follow the relevant WAI-ARIA Authoring Practices pattern.
+- Generated IDs use Vue's SSR-safe `useId()`.
+- Consumer and generated description references are merged.
+- Wrapped controls deliberately forward attributes to the native element.
+- Complex behavior has interaction contract tests; representative markup is scanned with axe.
 
-**In Progress:** ShInput, ShCheckbox
+See [Accessibility](./docs/accessibility.md) and [Accessibility testing](./docs/testing.md). Automated tests cannot replace browser and assistive-technology testing; the current manual support matrix is explicitly tracked as pending rather than implied.
 
-**Planned:** ShDialog, ShTabs, ShCombobox, ShSelect, ShAccordion, ShBreadcrumbs, ShField, ShForm, ShPagination, ShRadioGroup, ShSwitch, ShTextarea, ShTooltip
+## Styling
+
+ShoeHorn UI ships minimal structural and accessibility-essential styles through `shoehorn-ui/style.css`. Components expose `sh-` BEM classes, CSS custom properties, and state attributes such as `data-state`, `data-disabled`, and `data-invalid`.
+
+Consumer themes are responsible for maintaining accessible color contrast. See [Styling](./docs/styling.md).
 
 ## Development
 
-- Built with Vue 3 + TypeScript
-- ESLint + Prettier for code quality
-- Vitest for component unit testing
-- Composables + Utils for code reuse
+```bash
+npm ci
+npm run check
+```
 
-## Type Safety
+`npm run check` runs linting, formatting verification, type declaration generation, tests, axe scans, and the production build.
 
-- Discriminated unions enforce correct prop usage at compile time, for example:
+Before contributing, read [AGENTS.md](./AGENTS.md) and [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-- Using `as="a"` on a [ShButton] requires `href`
-- `iconOnly` requires `label`
-- No invalid prop combinations, ever
+## Project status
 
-See [Contributing Guide](./CONTRIBUTING.md) for development setup.
+ShoeHorn UI is pre-1.0. APIs can evolve as browser and assistive-technology verification expands. The source and automated contracts are substantially hardened, but manual screen-reader combinations listed in [docs/testing.md](./docs/testing.md) must be completed before describing the library as broadly assistive-technology verified.
 
----
-
-# Browser Support
-
-- Chrome/Edge 90+
-- Firefox 88+
-- Safari 14+
-
----
-
-# Testing
-
-All components have:
-
-- Unit tests (Vitest)
-- Accessibility tests
-- v-model/emit tests
-
----
-
-# License
+## License
 
 MIT
-
-Free software, Hell Yeah!
