@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
+import { computed, inject, useAttrs, useId, watchEffect } from "vue";
 import { useFocus } from "../../composables";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
+import type { SelectOption } from "./types";
 
-interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
-}
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
@@ -21,10 +20,7 @@ const props = withDefaults(
     error?: string;
     description?: string;
   }>(),
-  {
-    disabled: false,
-    required: false,
-  },
+  { options: () => [], disabled: false, required: false },
 );
 
 const emit = defineEmits<{
@@ -35,116 +31,114 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-const { elementRef, focus, blur, onFocus, onBlur } =
+const field = inject(shFieldKey, null);
+const generatedId = useId();
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
   useFocus<HTMLSelectElement>();
+const selectId = computed(
+  () => props.id ?? field?.controlId.value ?? `sh-select-${generatedId}`,
+);
+const labelId = computed(() =>
+  props.label ? `${selectId.value}-label` : undefined,
+);
+const errorId = computed(() =>
+  props.error ? `${selectId.value}-error` : undefined,
+);
+const descriptionId = computed(() =>
+  props.description ? `${selectId.value}-description` : undefined,
+);
+const resolvedLabelledBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-labelledby"),
+    labelId.value,
+    field?.labelId.value,
+  ),
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-describedby"),
+    field?.describedBy.value,
+    descriptionId.value,
+    errorId.value,
+  ),
+);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const isInvalid = computed(
+  () => Boolean(props.error) || field?.invalid.value || false,
+);
+const dataState = computed(() =>
+  isDisabled.value
+    ? "disabled"
+    : isInvalid.value
+      ? "invalid"
+      : isFocused.value
+        ? "focused"
+        : "idle",
+);
 
-const selectId = computed(() => {
-  return props.id ?? `sh-select-${Math.random().toString(36).slice(2)}`;
-});
-
-const errorId = computed(() => {
-  return props.error ? `${selectId.value}-error` : undefined;
-});
-
-const descriptionId = computed(() => {
-  return props.description ? `${selectId.value}-description` : undefined;
-});
-
-const ariaDescribedby = computed(() => {
-  const ids = [errorId.value, descriptionId.value].filter(Boolean);
-  const customDescribedby = attrs["aria-describedby"];
-  if (customDescribedby) {
-    ids.push(customDescribedby as string);
-  }
-  return ids.length > 0 ? ids.join(" ") : undefined;
-});
-
-const dataState = computed(() => {
-  if (props.disabled) return "disabled";
-  if (props.error) return "invalid";
-  return "idle";
-});
-
-function onChange(event: Event) {
-  if (props.disabled) return;
-
-  const target = event.target as HTMLSelectElement;
-  emit("update:modelValue", target.value);
-  emit("change", target.value, event);
+function handleChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value;
+  emit("update:modelValue", value);
+  emit("change", value, event);
 }
-
-defineExpose({ focus, blur });
-
 function handleFocus(event: FocusEvent) {
   onFocus();
   emit("focus", event);
 }
-
 function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }
 
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const hasLabel =
-      !!props.label ||
-      attrs["aria-label"] !== undefined ||
-      attrs["aria-labelledby"] !== undefined;
-
-    if (!hasLabel) {
-      console.warn(
-        "[ShSelect] Select has no accessible label. " +
-          "Provide `label`, `aria-label`, or `aria-labelledby`.",
-      );
-    }
-
-    if (!props.options || props.options.length === 0) {
-      console.warn(
-        "[ShSelect] Select has no options. " +
-          "Provide the `options` prop with at least one option.",
-      );
-    }
-
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
     if (
-      props.required &&
-      props.label &&
-      !props.label.includes("*") &&
-      !props.label.toLowerCase().includes("required")
+      !props.label &&
+      !getAttrString(attrs, "aria-label") &&
+      !resolvedLabelledBy.value
     ) {
       console.warn(
-        "[ShSelect] Select is required but label doesn't indicate this visually. " +
-          "Consider adding an asterisk (*) or '(required)' to the label text.",
+        "[ShSelect] Select requires an accessible name. Provide `label`, `aria-label`, or `aria-labelledby`.",
       );
     }
-  }
-});
+  });
+}
+
+defineExpose({ focus, blur });
 </script>
 
 <template>
-  <div class="sh-select">
-    <label v-if="label" :for="selectId" class="sh-select__label">
-      {{ label }}
-    </label>
-
+  <div class="sh-select" :data-state="dataState">
+    <label
+      v-if="label"
+      :id="labelId"
+      :for="selectId"
+      class="sh-select__label"
+      >{{ label }}</label
+    >
     <select
+      v-bind="attrs"
       :id="selectId"
       ref="elementRef"
       class="sh-select__control"
       :name="name"
       :value="modelValue"
-      :disabled="disabled"
-      :required="required"
-      :aria-invalid="error ? 'true' : undefined"
-      :aria-label="attrs['aria-label'] as string | undefined"
-      :aria-labelledby="attrs['aria-labelledby'] as string | undefined"
-      :aria-describedby="ariaDescribedby"
+      :disabled="isDisabled"
+      :required="isRequired"
+      :aria-invalid="isInvalid || undefined"
+      :aria-labelledby="resolvedLabelledBy"
+      :aria-describedby="resolvedDescribedBy"
       :data-state="dataState"
-      @change="onChange"
+      @change="handleChange"
       @focus="handleFocus"
       @blur="handleBlur"
     >
-      <option v-if="placeholder" value="" disabled :selected="!modelValue">
+      <option v-if="placeholder" value="" :disabled="isRequired">
         {{ placeholder }}
       </option>
       <option
@@ -156,13 +150,9 @@ onMounted(() => {
         {{ option.label }}
       </option>
     </select>
-
     <p v-if="description" :id="descriptionId" class="sh-select__description">
       {{ description }}
     </p>
-
-    <p v-if="error" :id="errorId" class="sh-select__error" role="alert">
-      {{ error }}
-    </p>
+    <p v-if="error" :id="errorId" class="sh-select__error">{{ error }}</p>
   </div>
 </template>

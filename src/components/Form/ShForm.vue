@@ -1,54 +1,24 @@
 <script setup lang="ts">
-import { provide, ref, onMounted } from "vue";
+import { ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    as?: string;
-    name?: string;
+    as?: "form" | "div";
+    preventDefault?: boolean;
   }>(),
-  {
-    as: "form",
-  },
+  { as: "form", preventDefault: false },
 );
-
-const emit = defineEmits<{
-  submit: [event: Event];
-}>();
-
-// NOTE: Share form metadata with child components.
-const formName = ref(props.name);
-provide("formName", formName);
-const formRef = ref<HTMLElement>();
-
-function handleSubmit(event: Event) {
+const emit = defineEmits<{ submit: [event: SubmitEvent] }>();
+const formRef = ref<HTMLFormElement | HTMLDivElement>();
+function handleSubmit(event: SubmitEvent) {
+  if (props.preventDefault) event.preventDefault();
   emit("submit", event);
 }
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    if (!(formRef.value instanceof HTMLFormElement)) return;
-
-    const inputs = formRef.value.querySelectorAll("[required]");
-    const hasRequiredInputs = inputs.length > 0;
-    const hasSubmitButton = formRef.value.querySelector('[type="submit"]');
-
-    if (hasRequiredInputs && !hasSubmitButton) {
-      console.warn(
-        "[ShForm] Form has required fields but no submit button. " +
-          'Add a button with type="submit" for proper form submission.',
-      );
-    }
-  }
-});
+defineExpose({ element: formRef });
 </script>
 
 <template>
-  <component
-    :is="as"
-    ref="formRef"
-    class="sh-form"
-    @submit.prevent="handleSubmit"
-  >
+  <component :is="as" ref="formRef" class="sh-form" @submit="handleSubmit">
     <slot />
   </component>
 </template>

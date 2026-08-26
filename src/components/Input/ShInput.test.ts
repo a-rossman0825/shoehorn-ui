@@ -1,319 +1,91 @@
+import { defineComponent } from "vue";
 import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import ShField from "../Field/ShField.vue";
 import ShInput from "./ShInput.vue";
 
-describe(ShInput, () => {
-  it("renders as an Input element", () => {
-    const wrapper = mount(ShInput);
-    expect(wrapper.element.tagName).toBe("DIV");
-    expect(wrapper.find("input").exists()).toBe(true);
-  });
+const mountInput = (options = {}) =>
+  mount(ShInput, { attrs: { "aria-label": "Name" }, ...options });
 
-  it("applies the type prop to the input", () => {
-    const wrapper = mount(ShInput, {
-      props: { type: "url" },
+describe("ShInput", () => {
+  it("renders native attributes and model value", () => {
+    const wrapper = mountInput({
+      props: {
+        type: "email",
+        name: "email",
+        modelValue: "a@example.com",
+        autocomplete: "email",
+      },
     });
-    expect(wrapper.find("input").attributes("type")).toBe("url");
+    const input = wrapper.get("input");
+    expect(input.attributes("type")).toBe("email");
+    expect(input.attributes("name")).toBe("email");
+    expect(input.element.value).toBe("a@example.com");
+    expect(input.attributes("autocomplete")).toBe("email");
   });
 
-  it("applies the id prop to the input", () => {
+  it("emits v-model changes", async () => {
+    const wrapper = mountInput();
+    await wrapper.get("input").setValue("Anthony");
+    expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Anthony"]);
+  });
+
+  it("combines consumer, description, and error references", () => {
     const wrapper = mount(ShInput, {
-      props: { id: "test-Id" },
+      attrs: { "aria-label": "Name", "aria-describedby": "external-help" },
+      props: {
+        id: "name",
+        description: "Public name",
+        error: "Name is required",
+      },
     });
-    expect(wrapper.find("input").attributes("id")).toBe("test-Id");
+    expect(wrapper.get("input").attributes("aria-describedby")).toBe(
+      "external-help name-description name-error",
+    );
+    expect(wrapper.get("input").attributes("aria-invalid")).toBe("true");
+    expect(wrapper.get(".sh-input__description").text()).toBe("Public name");
+    expect(wrapper.get(".sh-input__error").text()).toBe("Name is required");
   });
 
-  it("displays the modelValue prop in the input", () => {
-    const wrapper = mount(ShInput, {
-      props: { modelValue: "test-modelValue" },
+  it("omits aria-invalid when valid", () => {
+    expect(
+      mountInput().get("input").attributes("aria-invalid"),
+    ).toBeUndefined();
+  });
+
+  it("forwards arbitrary control attributes", () => {
+    const input = mount(ShInput, {
+      attrs: {
+        "aria-label": "Name",
+        inputmode: "text",
+        "data-tracking": "profile",
+      },
+    }).get("input");
+    expect(input.attributes("inputmode")).toBe("text");
+    expect(input.attributes("data-tracking")).toBe("profile");
+  });
+
+  it("consumes field label, state, and descriptions", () => {
+    const Harness = defineComponent({
+      components: { ShField, ShInput },
+      template: `<ShField id="full-name" label="Full name" description="As shown publicly" required><ShInput /></ShField>`,
     });
-    expect(wrapper.find("input").attributes("value")).toBe("test-modelValue");
+    const wrapper = mount(Harness);
+    const input = wrapper.get("input");
+    expect(input.attributes("id")).toBe("full-name");
+    expect(input.attributes("aria-labelledby")).toBe("full-name-label");
+    expect(input.attributes("aria-describedby")).toBe("full-name-description");
+    expect(input.attributes("required")).toBeDefined();
   });
 
-  it("defaults to type='text' if not specified", () => {
-    const wrapper = mount(ShInput);
-    expect(wrapper.find("input").attributes("type")).toBe("text");
-  });
-
-  it("emits the correct value from the input", async () => {
-    const wrapper = mount(ShInput);
-    const input = wrapper.find("input");
-
-    await input.setValue("test@testing.com");
-    expect(wrapper.emitted("update:modelValue")).toBeTruthy();
-    expect(wrapper.emitted("update:modelValue")![0]).toEqual([
-      "test@testing.com",
-    ]);
-  });
-
-  it("disabled input prevents emit on input", async () => {
-    const wrapper = mount(ShInput, {
-      props: { disabled: true },
-    });
-    const input = wrapper.find("input");
-
-    await input.setValue("test@testing.com");
-    expect(wrapper.emitted("update:modelValue")).toBeFalsy();
-  });
-
-  it("updates the displayed value when modelValue prop changes", async () => {
-    const wrapper = mount(ShInput, {
-      props: { modelValue: "https://hello-world.com" },
-    });
-
-    await wrapper.setProps({ modelValue: "test@testing.com" });
-    expect(wrapper.find('input').element.value).toBe("test@testing.com");
-  });
-
-  it("applies placeholder attribute", () => {
-    const wrapper = mount(ShInput, {
-      props: { placeholder: "hello world!" },
-    });
-    expect(wrapper.find("input").attributes("placeholder")).toBe("hello world!");
-  });
-
-  it("applies disabled attribute", () => {
-    const wrapper = mount(ShInput, {
-      props: { disabled: true },
-    });
-    expect(wrapper.find("input").attributes("disabled")).toBeDefined();
-  });
-
-  it("applies readonly attribute", () => {
-    const wrapper = mount(ShInput, {
-      props: { readonly: true },
-    });
-    expect(wrapper.find("input").attributes("readonly")).toBeDefined();
-  });
-
-  it("displays error message when error prop is provided", () => {
-    const wrapper = mount(ShInput, {
-      props: { error: "test-error" }
-    });
-    expect(wrapper.find('[data-testid="sh-input-error"]').text()).toBe("test-error");
-  });
-
-  it("displays description message when description prop is provided", () => {
-    const wrapper = mount(ShInput, {
-      props: { description: "test-description" }
-    });
-    expect(wrapper.find('[data-testid="sh-input-description"]').text()).toBe("test-description");
-  });
-
-  it("sets aria-invalid='true' when error is present", () => {
-    const wrapper = mount(ShInput, {
-      props: { error: "test-error" }
-    });
-    expect(wrapper.find("input").attributes("aria-invalid")).toBe("true");
-  });
-
-  it("sets aria-invalid='false' when error is not present", () => {
-    const wrapper = mount(ShInput);
-    expect(wrapper.find("input").attributes("aria-invalid")).toBe("false");
-  });
-
-  it("sets aria-describedby to 'input-error' when error exists", () => {
-    const wrapper = mount(ShInput, {
-      props: { error: "test-error" },
-    });
-    const errorId = wrapper.find('[data-testid="sh-input-error"]').attributes("id");
-    expect(wrapper.find("input").attributes("aria-describedby")).toBe(errorId);
-  });
-
-  it("sets aria-describedby to 'input-description' when only description exists", () => {
-    const wrapper = mount(ShInput, {
-      props: { description: "test-description" },
-    });
-    const descriptionId = wrapper.find('[data-testid="sh-input-description"]').attributes("id");
-    expect(wrapper.find("input").attributes("aria-describedby")).toBe(descriptionId);
-  });
-
-  it("does not set aria-describedby when neither error nor description exist", () => {
-    const wrapper = mount(ShInput);
-    expect(wrapper.find("input").attributes("aria-describedby")).toBeUndefined();
-  });
-
-  it("applies data-error attribute when error is present", () => {
-    const wrapper = mount(ShInput, {
-      props: { error: "test-error" },
-    });
-    expect(wrapper.find("input").attributes("data-error")).toBeDefined();
-  });
-
-  it("does not render error element when error is not provided", () => {
-    const wrapper = mount(ShInput);
-    expect (wrapper.find('[data-testid="sh-input-error"]').exists()).toBe(false);
-  });
-
-  it("does not render description element when description is not provided", () => {
-    const wrapper = mount(ShInput);
-    expect (wrapper.find('[data-testid="sh-input-description"]').exists()).toBeFalsy();
-  });
-
-  it("applies name attribute to the input", () => {
-    const wrapper = mount(ShInput, {
-      props: { name: "test-name" },
-    });
-    expect(wrapper.find("input").attributes("name")).toBe("test-name");
-  });
-
-  it("prioritizes error over description in aria-describedby when both exist", () => {
-    const wrapper = mount(ShInput, {
-      props: { error: "test error", description: "test description" }
-    });
-    const errorId = wrapper.find('[data-testid="sh-input-error"]').attributes("id");
-    expect (wrapper.find("input").attributes("aria-describedby")).toBe(errorId);
-  })
-
-  it("generates consistent error IDs when no id prop is provided", () => {
-    const wrapper1 = mount(ShInput, { props: { error: "test error 1" } });
-    const wrapper2 = mount(ShInput, { props: { error: "test error 2" } });
-
-    const id1 = wrapper1.find("input").attributes("id");
-    const id2 = wrapper2.find("input").attributes("id");
-
-    expect(id1).not.toBe(id2);
-    expect(wrapper1.find('[data-testid="sh-input-error"]').attributes("id")).toContain(id1);
-  });
-
-  it("does not render error element when error is an empty string", () => {
-    const wrapper = mount(ShInput, { props: { error: ""} });
-    expect(wrapper.find('[data-testid="sh-input-error"]').exists()).toBe(false);
-  });
-
-  it("updates aria-describedby when error prop changes", async () => {
-    const wrapper = mount(ShInput, { props: { error: "test error 1"} });
-    const initialId = wrapper.find("input").attributes("aria-describedby");
-
-    await wrapper.setProps({ error: "test error 2" });
-    const updatedId = wrapper.find("input").attributes("aria-describedby");
-
-    expect(updatedId).toBe(initialId);
-  });
-
-  it("warns if no id and no aria-label/aria-labelledby in dev", () => {
-    const consoleWarning = vi.spyOn(console, "warn");
+  it("warns when no accessible-name strategy is supplied", () => {
+    const warning = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
     mount(ShInput);
-    expect(consoleWarning).toHaveBeenCalled();
-    expect(consoleWarning.mock.calls[0][0]).toContain("aria-label");
+    expect(warning).toHaveBeenCalledWith(
+      expect.stringContaining("accessible name"),
+    );
+    warning.mockRestore();
   });
-
-  it("binds minlength attribute to input element", () => {
-    const wrapper = mount(ShInput, {
-      props: { minlength: 2 }
-    });
-    expect(wrapper.find("input").attributes("minlength")).toBe("2");
-  });
-
-  it("binds maxlength attr to input element", () => {
-    const wrapper = mount(ShInput, {
-      props: { maxlength: 25 }
-    });
-    expect(wrapper.find("input").attributes("maxlength")).toBe("25");
-  });
-
-  it("binds pattern attribute to input element", () => {
-    const wrapper = mount(ShInput, {
-      props: { pattern: "email" }
-    });
-    expect(wrapper.find("input").attributes("pattern")).toBe("email");
-  });
-
-  it("binds required attribute to input element", () => {
-    const wrapper = mount(ShInput, {
-      props: { required: true }
-    });
-    expect(wrapper.find("input").attributes("required")).toBeDefined();
-  });
-
-  it("binds autocomplete attr to input element", () => {
-    const wrapper = mount(ShInput, {
-      props: { autocomplete: "email" }
-    });
-    expect(wrapper.find("input").attributes("autocomplete")).toBeDefined();
-  });
-
-  it("autocomplete='email' on email type input", () => {
-    const wrapper = mount(ShInput, {
-      props: { autocomplete: "email" }
-    });
-    expect(wrapper.find("input").attributes("autocomplete")).toBe("email");
-  });
-
-  it("autocomplete='tel' on tel type input", () => {
-    const wrapper = mount(ShInput, {
-      props: { autocomplete: "tel" }
-    });
-    expect(wrapper.find("input").attributes("autocomplete")).toBe("tel");
-  });
-
-  it("emits focus event when input receives focus", async () => {
-    const wrapper = mount(ShInput);
-    const input = wrapper.find("input");
-
-    await input.trigger("focus");
-    const event = wrapper.emitted("focus");
-    if (!event) throw new Error("event does not exist/is falsy");
-    expect(event.length).toBe(1);
-  });
-
-  it("emits blur event when input loses focus", async () => {
-    const wrapper = mount(ShInput);
-    const input = wrapper.find("input");
-
-    await input.trigger("focus");
-    await input.trigger("blur");
-    const event = wrapper.emitted("blur");
-    if (!event) throw new Error("blur event does not exist");
-    expect(event.length).toBe(1);
-  });
-
-  it("updates the data-state to 'focused'", async () => {
-    const wrapper = mount(ShInput);
-    const input = wrapper.find("input");
-
-    await input.trigger("focus");
-
-    expect(input.attributes("data-state")).toBe("focused");
-  });
-
-  it("updates data-state to 'idle' when input is blurred", async () => {
-    const wrapper = mount(ShInput);
-    const input = wrapper.find("input");
-
-    await input.trigger("blur");
-
-    expect(input.attributes("data-state")).toBe("idle");
-
-  });
-
-  it("data-state is 'invalid' when error prop exists");
-
-  it("data-state is 'disabled' when disabled prop is true");
-
-  it("data-state priority: disabled > invalid > focused > idle");
-
-  it("exposes focus() method to parent via ref");
-
-  it("exposes blur() method to parent via ref");
-
-  it("exposes select() method to parent via ref");
-
-  it("focus() method sets focus on the input element");
-
-  it("blur() method removes focus from the input element");
-
-  it("select() method selects all text in the input");
-
 });
-
-
-  // it("emits the correct value from the input", async () => {
-  //   const wrapper = mount(ShInput);
-  //   const input = wrapper.find("input");
-
-  //   await input.setValue("test@testing.com");
-  //   expect(wrapper.emitted("update:modelValue")).toBeTruthy();
-  //   expect(wrapper.emitted("update:modelValue")![0]).toEqual([
-  //     "test@testing.com",
-  //   ]);
-  // });

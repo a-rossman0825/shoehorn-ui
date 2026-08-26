@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
-import { getAttrString } from "../../utils";
-import { hasAccessibleName } from "../../utils/hasAccessibleName";
+import { computed, inject, useAttrs, useId, watchEffect } from "vue";
 import { useFocus } from "../../composables";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
 
-type inputType = "text" | "email" | "password" | "search" | "url" | "tel";
+defineOptions({ inheritAttrs: false });
+
+type InputType = "text" | "email" | "password" | "search" | "url" | "tel";
 
 const props = withDefaults(
   defineProps<{
-    type?: inputType;
+    type?: InputType;
     id?: string;
     name?: string;
     modelValue?: string;
@@ -23,25 +25,8 @@ const props = withDefaults(
     required?: boolean;
     autocomplete?: string;
   }>(),
-  {
-    type: "text",
-    id: undefined,
-    name: undefined,
-    modelValue: undefined,
-    placeholder: undefined,
-    disabled: false,
-    readonly: false,
-    error: undefined,
-    description: undefined,
-    minlength: 0,
-    maxlength: undefined,
-    pattern: undefined,
-    required: false,
-    autocomplete: undefined,
-  },
+  { type: "text", disabled: false, readonly: false, required: false },
 );
-
-const { isFocused, elementRef, focus, blur, onFocus, onBlur } = useFocus<HTMLInputElement>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: string];
@@ -49,89 +34,84 @@ const emit = defineEmits<{
   blur: [event: FocusEvent];
 }>();
 
-const handleInput = (event: Event) => {
-  if (props.disabled) return;
+const attrs = useAttrs();
+const field = inject(shFieldKey, null);
+const generatedId = useId();
+const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
+  useFocus<HTMLInputElement>();
 
-  const target = event.target as HTMLInputElement;
-  emit("update:modelValue", target.value);
-};
-
-const handleFocus = (event: FocusEvent) => {
-  onFocus();
-  emit("focus", event);
-};
-
-const handleBlur = (event: FocusEvent) => {
-  onBlur();
-  emit("blur", event);
-};
-
-
-const ariaInvalid = computed(() => Boolean(props.error));
-
-const ariaDescribedBy = computed((): string | undefined => {
-  if (props.error) {
-    return errorId.value;
-  } else if (props.description) {
-    return descriptionId.value;
-  } else {
-    return undefined;
-  }
-});
-
-const attrs = useAttrs() as Record<string, unknown>;
-
-//NOTE - auto-generated fallback IDs
-const inputId = computed((): string => {
-  if (props.id) return props.id;
-  const generatedId = Math.random().toString(36).slice(2);
-  return `Sh-Input-${generatedId}`;
-});
-
-const errorId = computed((): string | undefined => {
-  return props.error ? `${inputId.value}-error` : undefined;
-});
-
-const descriptionId = computed((): string | undefined => {
-  return props.description ? `${inputId.value}-description` : undefined;
-});
-
-//NOTE - checks current state and returns a string
-const dataState = computed((): string => {
-  if (props.disabled) return "disabled";
-  if (props.error) return "invalid";
+const inputId = computed(
+  () => props.id ?? field?.controlId.value ?? `sh-input-${generatedId}`,
+);
+const errorId = computed(() =>
+  props.error ? `${inputId.value}-error` : undefined,
+);
+const descriptionId = computed(() =>
+  props.description ? `${inputId.value}-description` : undefined,
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-describedby"),
+    field?.describedBy.value,
+    descriptionId.value,
+    errorId.value,
+  ),
+);
+const resolvedLabelledBy = computed(
+  () => getAttrString(attrs, "aria-labelledby") ?? field?.labelId.value,
+);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const isInvalid = computed(
+  () => Boolean(props.error) || field?.invalid.value || false,
+);
+const dataState = computed(() => {
+  if (isDisabled.value) return "disabled";
+  if (isInvalid.value) return "invalid";
   if (isFocused.value) return "focused";
   return "idle";
 });
 
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const ariaLabel = getAttrString(attrs, "aria-label");
-    const ariaLabelledBy = getAttrString(attrs, "aria-labelledby");
-
-    const accessible = hasAccessibleName(ariaLabel, ariaLabelledBy, false);
-
-    if (!props.id && !accessible) {
-      console.warn(
-        "[ShInput] should have one of: `id` to (associate with external label), " +
-          "`aria-label`, or `aria-labelledby",
-      );
-    };
+function handleInput(event: Event) {
+  if (!isDisabled.value) {
+    emit("update:modelValue", (event.target as HTMLInputElement).value);
   }
-});
+}
 
-defineExpose({
-  focus,
-  blur,
-  select: () => elementRef.value?.select()
-});
+function handleFocus(event: FocusEvent) {
+  onFocus();
+  emit("focus", event);
+}
 
+function handleBlur(event: FocusEvent) {
+  onBlur();
+  emit("blur", event);
+}
+
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
+    const hasName = Boolean(
+      getAttrString(attrs, "aria-label") || resolvedLabelledBy.value || field,
+    );
+    if (!hasName && !props.id) {
+      console.warn(
+        "[ShInput] Input requires an accessible name. Provide an associated label, `aria-label`, or `aria-labelledby`.",
+      );
+    }
+  });
+}
+
+defineExpose({ focus, blur, select: () => elementRef.value?.select() });
 </script>
 
 <template>
-  <div class="sh-input">
+  <div class="sh-input" :data-state="dataState">
     <input
+      v-bind="attrs"
       :id="inputId"
       ref="elementRef"
       class="sh-input__control"
@@ -139,38 +119,26 @@ defineExpose({
       :value="modelValue"
       :type="type"
       :placeholder="placeholder"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :readonly="readonly"
-      :data-error="error || undefined"
-      :aria-invalid="ariaInvalid"
-      :aria-describedby="ariaDescribedBy"
-      data-testid="sh-input-test-id"
       :minlength="minlength"
       :maxlength="maxlength"
       :pattern="pattern"
-      :required="required"
+      :required="isRequired"
       :autocomplete="autocomplete"
+      :aria-invalid="isInvalid || undefined"
+      :aria-labelledby="resolvedLabelledBy"
+      :aria-describedby="resolvedDescribedBy"
       :data-state="dataState"
       @input="handleInput"
       @focus="handleFocus"
-      @blur = "handleBlur"
+      @blur="handleBlur"
     />
-    <p
-      v-if="error"
-      :id="errorId"
-      class="sh-input__error"
-      data-testid="sh-input-error"
-      role="alert"
-    >
-      {{ error }}
-    </p>
-    <p
-      v-if="description"
-      :id="descriptionId"
-      class="sh-input__description"
-      data-testid="sh-input-description"
-    >
+    <p v-if="description" :id="descriptionId" class="sh-input__description">
       {{ description }}
+    </p>
+    <p v-if="error" :id="errorId" class="sh-input__error">
+      {{ error }}
     </p>
   </div>
 </template>

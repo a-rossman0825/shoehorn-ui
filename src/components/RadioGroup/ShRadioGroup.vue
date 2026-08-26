@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, provide, useAttrs } from "vue";
+import { computed, inject, useAttrs, useId, watchEffect } from "vue";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
+import type { RadioOption } from "./types";
 
-interface RadioOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
-}
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
@@ -18,140 +17,74 @@ const props = withDefaults(
     label?: string;
   }>(),
   {
+    options: () => [],
     orientation: "vertical",
     disabled: false,
     required: false,
   },
 );
-
 const emit = defineEmits<{
   "update:modelValue": [value: string];
   change: [value: string, event: Event];
 }>();
-
 const attrs = useAttrs();
-const groupId = computed(
-  () => `sh-radio-group-${Math.random().toString(36).slice(2)}`,
+const field = inject(shFieldKey, null);
+const generatedId = useId();
+const groupId = computed(() => `sh-radio-group-${generatedId}`);
+const legendId = computed(() =>
+  props.label ? `${groupId.value}-legend` : undefined,
 );
-
-// NOTE: Expose group-level state/actions to child radios.
-provide("radioGroup", {
-  name: props.name || groupId.value,
-  modelValue: computed(() => props.modelValue),
-  disabled: computed(() => props.disabled),
-  updateValue: (value: string, event: Event) => {
-    if (!props.disabled) {
-      emit("update:modelValue", value);
-      emit("change", value, event);
-    }
-  },
-});
-
-function onChange(value: string, event: Event) {
-  if (!props.disabled) {
-    emit("update:modelValue", value);
-    emit("change", value, event);
-  }
+const groupName = computed(() => props.name ?? groupId.value);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const resolvedLabelledBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-labelledby"),
+    legendId.value,
+    field?.labelId.value,
+  ),
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(getAttrString(attrs, "aria-describedby"), field?.describedBy.value),
+);
+function handleChange(option: RadioOption, event: Event) {
+  if (isDisabled.value || option.disabled) return;
+  emit("update:modelValue", option.value);
+  emit("change", option.value, event);
 }
-
-function onKeydown(event: KeyboardEvent) {
-  if (props.disabled || !props.options) return;
-
-  const enabledOptions = props.options.filter((opt) => !opt.disabled);
-  if (enabledOptions.length === 0) return;
-
-  let handled = false;
-  const currentIndex = enabledOptions.findIndex(
-    (opt) => opt.value === props.modelValue,
-  );
-
-  if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-    event.preventDefault();
-    const nextIndex = (currentIndex + 1) % enabledOptions.length;
-    onChange(enabledOptions[nextIndex].value, event as unknown as Event);
-    handled = true;
-  } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-    event.preventDefault();
-    const prevIndex =
-      currentIndex <= 0 ? enabledOptions.length - 1 : currentIndex - 1;
-    onChange(enabledOptions[prevIndex].value, event as unknown as Event);
-    handled = true;
-  }
-
-  if (handled) {
-    // NOTE: Keep keyboard nav and focus in sync.
-    setTimeout(() => {
-      const selectedRadio = document.querySelector(
-        `input[name="${props.name || groupId.value}"][value="${props.modelValue}"]`,
-      ) as HTMLInputElement;
-      selectedRadio?.focus();
-    }, 0);
-  }
-}
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const hasLabel =
-      !!props.label ||
-      attrs["aria-label"] !== undefined ||
-      attrs["aria-labelledby"] !== undefined;
-
-    if (!hasLabel) {
-      console.warn(
-        "[ShRadioGroup] Radio group has no accessible label. " +
-          "Provide `label`, `aria-label`, or `aria-labelledby`.",
-      );
-    }
-
-    if (!props.options || props.options.length === 0) {
-      console.warn(
-        "[ShRadioGroup] Radio group has no options. " +
-          "Provide the `options` prop with at least one radio option.",
-      );
-    }
-
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
     if (
-      props.required &&
-      props.label &&
-      !props.label.includes("*") &&
-      !props.label.toLowerCase().includes("required")
+      !props.label &&
+      !getAttrString(attrs, "aria-label") &&
+      !resolvedLabelledBy.value
     ) {
       console.warn(
-        "[ShRadioGroup] Radio group is required but label doesn't indicate this visually. " +
-          "Consider adding an asterisk (*) or '(required)' to the label text.",
+        "[ShRadioGroup] Radio group requires an accessible name. Provide `label`, `aria-label`, or `aria-labelledby`.",
       );
     }
-
-    if (props.options && props.options.length > 0 && !props.modelValue) {
-      console.warn(
-        "[ShRadioGroup] Radio group has options but no default value selected. " +
-          "Consider setting a default modelValue for better UX.",
-      );
-    }
-  }
-});
+    if (props.options.length === 0)
+      console.warn("[ShRadioGroup] Provide at least one radio option.");
+  });
+}
 </script>
 
 <template>
-  <div
+  <fieldset
+    v-bind="attrs"
     class="sh-radio-group"
-    role="radiogroup"
-    :aria-label="attrs['aria-label'] as string | undefined"
-    :aria-labelledby="
-      label
-        ? `${groupId}-label`
-        : (attrs['aria-labelledby'] as string | undefined)
-    "
-    :aria-describedby="attrs['aria-describedby'] as string | undefined"
-    :aria-required="required ? 'true' : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
+    :disabled="isDisabled"
+    :aria-labelledby="resolvedLabelledBy"
+    :aria-describedby="resolvedDescribedBy"
     :data-orientation="orientation"
-    @keydown="onKeydown"
   >
-    <legend v-if="label" :id="`${groupId}-label`" class="sh-radio-group__label">
+    <legend v-if="label" :id="legendId" class="sh-radio-group__label">
       {{ label }}
     </legend>
-
     <div class="sh-radio-group__options" :data-orientation="orientation">
       <div
         v-for="option in options"
@@ -162,23 +95,20 @@ onMounted(() => {
           :id="`${groupId}-${option.value}`"
           type="radio"
           class="sh-radio-group__input"
-          :name="name || groupId"
+          :name="groupName"
           :value="option.value"
           :checked="modelValue === option.value"
-          :disabled="disabled || option.disabled"
-          :required="required"
-          :tabindex="modelValue === option.value ? 0 : -1"
-          @change="onChange(option.value, $event)"
+          :disabled="option.disabled"
+          :required="isRequired"
+          @change="handleChange(option, $event)"
         />
         <label
           :for="`${groupId}-${option.value}`"
           class="sh-radio-group__option-label"
+          >{{ option.label }}</label
         >
-          {{ option.label }}
-        </label>
       </div>
     </div>
-
     <slot />
-  </div>
+  </fieldset>
 </template>

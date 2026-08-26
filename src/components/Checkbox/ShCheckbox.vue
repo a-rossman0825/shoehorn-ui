@@ -1,6 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs, watch } from "vue";
+import {
+  computed,
+  inject,
+  onMounted,
+  useAttrs,
+  useId,
+  watch,
+  watchEffect,
+} from "vue";
 import { useFocus } from "../../composables";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
+
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
@@ -18,6 +30,7 @@ const props = withDefaults(
     indeterminate: false,
     disabled: false,
     required: false,
+    value: "on",
   },
 );
 
@@ -28,108 +41,81 @@ const emit = defineEmits<{
   focus: [event: FocusEvent];
   blur: [event: FocusEvent];
 }>();
-
 const attrs = useAttrs();
+const field = inject(shFieldKey, null);
+const generatedId = useId();
 const { elementRef, focus, blur, onFocus, onBlur } =
   useFocus<HTMLInputElement>();
+const checkboxId = computed(
+  () => props.id ?? field?.controlId.value ?? `sh-checkbox-${generatedId}`,
+);
+const labelId = computed(() =>
+  props.label ? `${checkboxId.value}-label` : undefined,
+);
+const resolvedLabelledBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-labelledby"),
+    labelId.value,
+    field?.labelId.value,
+  ),
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(getAttrString(attrs, "aria-describedby"), field?.describedBy.value),
+);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const dataState = computed(() =>
+  isDisabled.value
+    ? "disabled"
+    : props.indeterminate
+      ? "indeterminate"
+      : props.modelValue
+        ? "checked"
+        : "unchecked",
+);
 
-const checkboxId = computed(() => {
-  return props.id ?? `sh-checkbox-${Math.random().toString(36).slice(2)}`;
-});
-
-const dataState = computed(() => {
-  if (props.disabled) return "disabled";
-  if (props.indeterminate) return "indeterminate";
-  if (props.modelValue) return "checked";
-  return "unchecked";
-});
-
-function onChange(event: Event) {
-  if (props.disabled) return;
-
-  const target = event.target as HTMLInputElement;
-
-  // NOTE: Once the user checks it, we clear the mixed state.
-  if (props.indeterminate) {
-    emit("update:indeterminate", false);
-  }
-
-  emit("update:modelValue", target.checked);
+function syncIndeterminate() {
+  if (elementRef.value) elementRef.value.indeterminate = props.indeterminate;
+}
+function handleChange(event: Event) {
+  if (props.indeterminate) emit("update:indeterminate", false);
+  emit("update:modelValue", (event.target as HTMLInputElement).checked);
   emit("change", event);
 }
-
-function onKeydown(event: KeyboardEvent) {
-  // NOTE: Match native checkbox keyboard behavior.
-  if (event.key === " ") {
-    event.preventDefault();
-    if (!props.disabled) {
-      elementRef.value?.click();
-    }
-  }
-}
-
-defineExpose({
-  focus,
-  blur,
-});
-
 function handleFocus(event: FocusEvent) {
   onFocus();
   emit("focus", event);
 }
-
 function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const hasLabel =
-      !!props.label ||
-      attrs["aria-label"] !== undefined ||
-      attrs["aria-labelledby"] !== undefined;
-
-    if (!hasLabel) {
-      console.warn(
-        "[ShCheckbox] Checkbox has no accessible label. " +
-          "Provide `label`, `aria-label`, or `aria-labelledby`.",
-      );
-    }
-
+onMounted(syncIndeterminate);
+watch(() => props.indeterminate, syncIndeterminate);
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
     if (
-      props.required &&
-      props.label &&
-      !props.label.includes("*") &&
-      !props.label.toLowerCase().includes("required")
+      !props.label &&
+      !getAttrString(attrs, "aria-label") &&
+      !resolvedLabelledBy.value
     ) {
       console.warn(
-        "[ShCheckbox] Checkbox is required but label doesn't indicate this visually. " +
-          "Consider adding an asterisk (*) or '(required)' to the label text.",
+        "[ShCheckbox] Checkbox requires an accessible name. Provide `label`, `aria-label`, or `aria-labelledby`.",
       );
     }
-  }
-
-  // NOTE: Keep DOM `indeterminate` in sync on first render.
-  if (elementRef.value) {
-    elementRef.value.indeterminate = props.indeterminate;
-  }
-});
-
-// NOTE: Keep DOM `indeterminate` in sync when prop changes later.
-watch(
-  () => props.indeterminate,
-  (value) => {
-    if (elementRef.value) {
-      elementRef.value.indeterminate = value;
-    }
-  },
-);
+  });
+}
+defineExpose({ focus, blur });
 </script>
 
 <template>
-  <div class="sh-checkbox">
+  <div class="sh-checkbox" :data-state="dataState">
     <input
+      v-bind="attrs"
       :id="checkboxId"
       ref="elementRef"
       type="checkbox"
@@ -137,20 +123,22 @@ watch(
       :name="name"
       :value="value"
       :checked="modelValue"
-      :disabled="disabled"
-      :required="required"
-      :aria-label="attrs['aria-label'] as string | undefined"
-      :aria-labelledby="attrs['aria-labelledby'] as string | undefined"
-      :aria-describedby="attrs['aria-describedby'] as string | undefined"
-      :aria-checked="indeterminate ? 'mixed' : modelValue ? 'true' : 'false'"
+      :disabled="isDisabled"
+      :required="isRequired"
+      :aria-labelledby="resolvedLabelledBy"
+      :aria-describedby="resolvedDescribedBy"
+      :aria-checked="indeterminate ? 'mixed' : undefined"
       :data-state="dataState"
-      @change="onChange"
-      @keydown="onKeydown"
+      @change="handleChange"
       @focus="handleFocus"
       @blur="handleBlur"
     />
-    <label v-if="label" :for="checkboxId" class="sh-checkbox__label">
-      {{ label }}
-    </label>
+    <label
+      v-if="label"
+      :id="labelId"
+      :for="checkboxId"
+      class="sh-checkbox__label"
+      >{{ label }}</label
+    >
   </div>
 </template>

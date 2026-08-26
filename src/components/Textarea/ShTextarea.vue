@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
+import { computed, inject, useAttrs, useId, watchEffect } from "vue";
 import { useFocus } from "../../composables";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
+
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
@@ -34,127 +38,122 @@ const emit = defineEmits<{
   focus: [event: FocusEvent];
   blur: [event: FocusEvent];
 }>();
-
 const attrs = useAttrs();
+const field = inject(shFieldKey, null);
+const generatedId = useId();
 const { isFocused, elementRef, focus, blur, onFocus, onBlur } =
   useFocus<HTMLTextAreaElement>();
+const textareaId = computed(
+  () => props.id ?? field?.controlId.value ?? `sh-textarea-${generatedId}`,
+);
+const labelId = computed(() =>
+  props.label ? `${textareaId.value}-label` : undefined,
+);
+const errorId = computed(() =>
+  props.error ? `${textareaId.value}-error` : undefined,
+);
+const descriptionId = computed(() =>
+  props.description ? `${textareaId.value}-description` : undefined,
+);
+const resolvedLabelledBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-labelledby"),
+    labelId.value,
+    field?.labelId.value,
+  ),
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-describedby"),
+    field?.describedBy.value,
+    descriptionId.value,
+    errorId.value,
+  ),
+);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const isInvalid = computed(
+  () => Boolean(props.error) || field?.invalid.value || false,
+);
+const dataState = computed(() =>
+  isDisabled.value
+    ? "disabled"
+    : isInvalid.value
+      ? "invalid"
+      : isFocused.value
+        ? "focused"
+        : "idle",
+);
 
-const textareaId = computed(() => {
-  return props.id ?? `sh-textarea-${Math.random().toString(36).slice(2)}`;
-});
-
-const errorId = computed(() => {
-  return props.error ? `${textareaId.value}-error` : undefined;
-});
-
-const descriptionId = computed(() => {
-  return props.description ? `${textareaId.value}-description` : undefined;
-});
-
-const ariaDescribedby = computed(() => {
-  const ids = [errorId.value, descriptionId.value].filter(Boolean);
-  const customDescribedby = attrs["aria-describedby"];
-  if (customDescribedby) {
-    ids.push(customDescribedby as string);
-  }
-  return ids.length > 0 ? ids.join(" ") : undefined;
-});
-
-const dataState = computed(() => {
-  if (props.disabled) return "disabled";
-  if (props.error) return "invalid";
-  if (isFocused.value) return "focused";
-  return "idle";
-});
-
-function onInput(event: Event) {
-  if (props.disabled) return;
-  const target = event.target as HTMLTextAreaElement;
-  emit("update:modelValue", target.value);
+function handleInput(event: Event) {
+  if (!isDisabled.value)
+    emit("update:modelValue", (event.target as HTMLTextAreaElement).value);
 }
-
 function handleFocus(event: FocusEvent) {
   onFocus();
   emit("focus", event);
 }
-
 function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }
 
-defineExpose({
-  focus,
-  blur,
-  select: () => elementRef.value?.select(),
-});
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const hasLabel =
-      !!props.label ||
-      attrs["aria-label"] !== undefined ||
-      attrs["aria-labelledby"] !== undefined;
-
-    if (!hasLabel) {
-      console.warn(
-        "[ShTextarea] Textarea has no accessible label. " +
-          "Provide `label`, `aria-label`, or `aria-labelledby`.",
-      );
-    }
-
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
     if (
-      props.required &&
-      props.label &&
-      !props.label.includes("*") &&
-      !props.label.toLowerCase().includes("required")
+      !props.label &&
+      !getAttrString(attrs, "aria-label") &&
+      !resolvedLabelledBy.value
     ) {
       console.warn(
-        "[ShTextarea] Textarea is required but label doesn't indicate this visually. " +
-          "Consider adding an asterisk (*) or '(required)' to the label text.",
+        "[ShTextarea] Textarea requires an accessible name. Provide `label`, `aria-label`, or `aria-labelledby`.",
       );
     }
-  }
-});
+  });
+}
+defineExpose({ focus, blur, select: () => elementRef.value?.select() });
 </script>
 
 <template>
-  <div class="sh-textarea">
-    <label v-if="label" :for="textareaId" class="sh-textarea__label">
-      {{ label }}
-    </label>
-
+  <div class="sh-textarea" :data-state="dataState">
+    <label
+      v-if="label"
+      :id="labelId"
+      :for="textareaId"
+      class="sh-textarea__label"
+      >{{ label }}</label
+    >
     <textarea
+      v-bind="attrs"
       :id="textareaId"
       ref="elementRef"
       class="sh-textarea__control"
       :name="name"
       :value="modelValue"
-      :disabled="disabled"
+      :disabled="isDisabled"
       :readonly="readonly"
-      :required="required"
+      :required="isRequired"
       :placeholder="placeholder"
       :minlength="minlength"
       :maxlength="maxlength"
       :rows="rows"
       :cols="cols"
-      :aria-invalid="error ? 'true' : undefined"
-      :aria-label="attrs['aria-label'] as string | undefined"
-      :aria-labelledby="attrs['aria-labelledby'] as string | undefined"
-      :aria-describedby="ariaDescribedby"
+      :aria-invalid="isInvalid || undefined"
+      :aria-labelledby="resolvedLabelledBy"
+      :aria-describedby="resolvedDescribedBy"
       :data-state="dataState"
       :data-resize="resize"
-      @input="onInput"
+      @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
     />
-
     <p v-if="description" :id="descriptionId" class="sh-textarea__description">
       {{ description }}
     </p>
-
-    <p v-if="error" :id="errorId" class="sh-textarea__error" role="alert">
-      {{ error }}
-    </p>
+    <p v-if="error" :id="errorId" class="sh-textarea__error">{{ error }}</p>
   </div>
 </template>

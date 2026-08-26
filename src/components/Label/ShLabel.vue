@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
-import { useHasSlotText } from "../../composables/useHasSlotText";
-import { getAttrString } from "../../utils";
-import { hasAccessibleName } from "../../utils/hasAccessibleName";
+import { computed, onMounted, onUpdated, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -11,61 +8,36 @@ const props = withDefaults(
     required?: boolean;
     srOnly?: boolean;
   }>(),
-  {
-    for: undefined,
-    htmlFor: undefined,
-    required: false,
-    srOnly: false,
-  },
+  { required: false, srOnly: false },
 );
-
-const resolvedFor = computed((): string | undefined => {
-  return props.for || props.htmlFor;
-});
-
-const attrs = useAttrs();
-
-/* NOTE - refactor: use "useHasSlotText() instead"
-  function hasSlotText() {
-    if (!slots.default) return false;
-    const result = slots.default();
-    if (!result) return false;
-    return result.some((vnode) => {
-      if (typeof vnode.children === "string"){
-        return vnode.children.trim().length > 0;
-      }
-      return vnode.children !== null;
-    })
-  }
-*/
-
-const hasSlotText = useHasSlotText();
-
-onMounted(() => {
+const labelRef = ref<HTMLLabelElement>();
+const resolvedFor = computed(() => props.for ?? props.htmlFor);
+function validateLabel() {
   if (process.env.NODE_ENV !== "production") {
-    const ariaLabel = getAttrString(attrs, "aria-label");
-    const accessible = hasAccessibleName(ariaLabel, undefined, hasSlotText());
-
-    if (!resolvedFor.value && !ariaLabel) {
+    if (!resolvedFor.value)
       console.warn(
-        "[ShLabel] should have a `for` attribute to associate it with a form control" +
-          " Provide the `for` attribute with the ID of the associated form control",
+        "[ShLabel] Label requires `for` to associate it with a form control.",
       );
-    }
-    if (!accessible) {
-      console.warn("[ShLabel] requires text content or aria-label...");
-    }
+    if (!labelRef.value?.textContent?.trim())
+      console.warn("[ShLabel] Label requires meaningful text content.");
   }
-});
+}
+onMounted(validateLabel);
+onUpdated(validateLabel);
 </script>
 
 <template>
   <label
+    ref="labelRef"
     class="sh-label"
     :for="resolvedFor"
     :data-required="required || undefined"
     :class="{ 'sh-label--sr-only': srOnly }"
   >
-    <slot></slot>
+    <slot />
+    <template v-if="required">
+      <span class="sh-label__required" aria-hidden="true">*</span>
+      <span class="sh-sr-only"> required</span>
+    </template>
   </label>
 </template>

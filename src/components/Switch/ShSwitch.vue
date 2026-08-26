@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, useAttrs } from "vue";
+import { computed, inject, useAttrs, useId, watchEffect } from "vue";
 import { useFocus } from "../../composables";
+import { getAttrString, mergeIds } from "../../utils";
+import { shFieldKey } from "../Field/fieldContext";
+
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
@@ -12,11 +16,7 @@ const props = withDefaults(
     id?: string;
     label?: string;
   }>(),
-  {
-    modelValue: false,
-    disabled: false,
-    required: false,
-  },
+  { modelValue: false, disabled: false, required: false, value: "on" },
 );
 
 const emit = defineEmits<{
@@ -25,133 +25,90 @@ const emit = defineEmits<{
   focus: [event: FocusEvent];
   blur: [event: FocusEvent];
 }>();
-
 const attrs = useAttrs();
+const field = inject(shFieldKey, null);
+const generatedId = useId();
 const { elementRef, focus, blur, onFocus, onBlur } =
-  useFocus<HTMLButtonElement>();
+  useFocus<HTMLInputElement>();
+const switchId = computed(
+  () => props.id ?? field?.controlId.value ?? `sh-switch-${generatedId}`,
+);
+const labelId = computed(() =>
+  props.label ? `${switchId.value}-label` : undefined,
+);
+const resolvedLabelledBy = computed(() =>
+  mergeIds(
+    getAttrString(attrs, "aria-labelledby"),
+    labelId.value,
+    field?.labelId.value,
+  ),
+);
+const resolvedDescribedBy = computed(() =>
+  mergeIds(getAttrString(attrs, "aria-describedby"), field?.describedBy.value),
+);
+const isDisabled = computed(
+  () => props.disabled || field?.disabled.value || false,
+);
+const isRequired = computed(
+  () => props.required || field?.required.value || false,
+);
+const dataState = computed(() =>
+  isDisabled.value ? "disabled" : props.modelValue ? "checked" : "unchecked",
+);
 
+function handleChange(event: Event) {
+  const checked = (event.target as HTMLInputElement).checked;
+  emit("update:modelValue", checked);
+  emit("change", checked, event);
+}
 function handleFocus(event: FocusEvent) {
   onFocus();
   emit("focus", event);
 }
-
 function handleBlur(event: FocusEvent) {
   onBlur();
   emit("blur", event);
 }
-
-const switchId = computed(() => {
-  return props.id ?? `sh-switch-${Math.random().toString(36).slice(2)}`;
-});
-
-const dataState = computed(() => {
-  if (props.disabled) return "disabled";
-  return props.modelValue ? "checked" : "unchecked";
-});
-
-function toggle(event: MouseEvent | KeyboardEvent) {
-  if (props.disabled) {
-    event.preventDefault();
-    return;
-  }
-
-  const newValue = !props.modelValue;
-  emit("update:modelValue", newValue);
-  emit("change", newValue, event as Event);
-}
-
-function onKeydown(event: KeyboardEvent) {
-  if (props.disabled) return;
-
-  if (event.key === " " || event.key === "Enter") {
-    event.preventDefault();
-    toggle(event);
-  }
-}
-
-defineExpose({
-  focus,
-  blur,
-});
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    const hasLabel =
-      !!props.label ||
-      attrs["aria-label"] !== undefined ||
-      attrs["aria-labelledby"] !== undefined;
-
-    if (!hasLabel) {
-      console.warn(
-        "[ShSwitch] Switch has no accessible label. " +
-          "Provide `label`, `aria-label`, or `aria-labelledby`.",
-      );
-    }
-
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
     if (
-      props.required &&
-      props.label &&
-      !props.label.includes("*") &&
-      !props.label.toLowerCase().includes("required")
+      !props.label &&
+      !getAttrString(attrs, "aria-label") &&
+      !resolvedLabelledBy.value
     ) {
       console.warn(
-        "[ShSwitch] Switch is required but label doesn't indicate this visually. " +
-          "Consider adding an asterisk (*) or '(required)' to the label text.",
+        "[ShSwitch] Switch requires an accessible name. Provide `label`, `aria-label`, or `aria-labelledby`.",
       );
     }
-  }
-});
+  });
+}
+defineExpose({ focus, blur });
 </script>
 
 <template>
-  <div class="sh-switch">
-    <button
+  <label class="sh-switch" :for="switchId" :data-state="dataState">
+    <input
+      v-bind="attrs"
       :id="switchId"
       ref="elementRef"
-      type="button"
-      role="switch"
-      class="sh-switch__control"
-      :aria-checked="modelValue"
-      :aria-label="attrs['aria-label'] as string | undefined"
-      :aria-labelledby="
-        label
-          ? `${switchId}-label`
-          : (attrs['aria-labelledby'] as string | undefined)
-      "
-      :aria-describedby="attrs['aria-describedby'] as string | undefined"
-      :aria-required="required ? 'true' : undefined"
-      :disabled="disabled"
-      :data-state="dataState"
-      @click="toggle"
-      @keydown="onKeydown"
-      @focus="handleFocus"
-      @blur="handleBlur"
-    >
-      <span class="sh-switch__thumb" :data-state="dataState" />
-    </button>
-
-    <!-- NOTE: Hidden input keeps this switch form-friendly when `name` is passed. -->
-    <input
-      v-if="name"
       type="checkbox"
+      role="switch"
+      class="sh-switch__input"
       :name="name"
       :value="value"
       :checked="modelValue"
-      :required="required"
-      :disabled="disabled"
-      style="position: absolute; opacity: 0; pointer-events: none"
-      tabindex="-1"
-      aria-hidden="true"
+      :disabled="isDisabled"
+      :required="isRequired"
+      :aria-labelledby="resolvedLabelledBy"
+      :aria-describedby="resolvedDescribedBy"
+      :data-state="dataState"
+      @change="handleChange"
+      @focus="handleFocus"
+      @blur="handleBlur"
     />
-
-    <label
-      v-if="label"
-      :id="`${switchId}-label`"
-      :for="switchId"
-      class="sh-switch__label"
-      @click="focus"
-    >
-      {{ label }}
-    </label>
-  </div>
+    <span class="sh-switch__control" aria-hidden="true" :data-state="dataState">
+      <span class="sh-switch__thumb" :data-state="dataState" />
+    </span>
+    <span v-if="label" :id="labelId" class="sh-switch__label">{{ label }}</span>
+  </label>
 </template>
