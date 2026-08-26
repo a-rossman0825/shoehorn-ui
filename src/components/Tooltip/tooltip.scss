@@ -1,0 +1,37 @@
+.sh-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.sh-tooltip__content {
+  position: absolute;
+  z-index: 60;
+  width: max-content;
+  max-width: min(20rem, 90vw);
+  padding: 0.375rem 0.5rem;
+  color: var(--sh-tooltip-text, #fff);
+  background: var(--sh-tooltip-background, #111827);
+  border-radius: var(--sh-radius-sm, 0.25rem);
+  font-size: 0.875rem;
+}
+
+.sh-tooltip__content[data-placement="top"] {
+  inset-block-end: calc(100% + 0.5rem);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.sh-tooltip__content[data-placement="bottom"] {
+  inset-block-start: calc(100% + 0.5rem);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+}
+.sh-tooltip__content[data-placement="left"] {
+  inset-inline-end: calc(100% + 0.5rem);
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}
+.sh-tooltip__content[data-placement="right"] {
+  inset-inline-start: calc(100% + 0.5rem);
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+}

@@ -1,0 +1,24 @@
+.sh-spinner {
+  display: inline-flex;
+}
+
+.sh-spinner__indicator {
+  width: 1em;
+  height: 1em;
+  border: 0.15em solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: sh-spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes sh-spinner-rotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-spinner__indicator {
+    animation: none;
+  }
+}
