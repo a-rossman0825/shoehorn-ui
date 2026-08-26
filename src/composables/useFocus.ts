@@ -1,8 +1,6 @@
 import { Ref, ref } from "vue";
 
-
-
-export function useFocus<T extends HTMLElement = HTMLElement>(){
+export function useFocus<T extends HTMLElement = HTMLElement>() {
   const isFocused = ref(false);
   const elementRef: Ref<T | null> = ref(null);
 
