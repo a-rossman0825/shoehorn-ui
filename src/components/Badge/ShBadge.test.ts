@@ -4,18 +4,19 @@ import ShBadge from "./ShBadge.vue";
 
 describe("ShBadge", () => {
   it("renders badge as span tag on mount", () => {
-    const wrapper = mount(ShBadge);
+    const wrapper = mount(ShBadge, { slots: { default: "Badge" } });
     expect(wrapper.element.tagName).toBe("SPAN");
   });
 
   it("renders badge with default data-variant (if none applied)", () => {
-    const wrapper = mount(ShBadge);
+    const wrapper = mount(ShBadge, { slots: { default: "Badge" } });
     expect(wrapper.attributes("data-variant")).toBe("default");
   });
 
   it("sets data-variant attr with prop value", () => {
     const wrapper = mount(ShBadge, {
       props: { variant: "warning" },
+      slots: { default: "Warning" },
     });
     expect(wrapper.attributes("data-variant")).toBe("warning");
   });
@@ -86,5 +87,6 @@ describe("ShBadge", () => {
       slots: { default: "Test text" },
     });
     expect(wrapper.text()).toBe("Test text");
+    expect(wrapper.attributes("aria-label")).toBeUndefined();
   });
 });

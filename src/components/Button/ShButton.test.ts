@@ -1,45 +1,48 @@
-import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
-import { ShButton } from "./index";
+import { describe, expect, it } from "vitest";
+import ShButton from "./ShButton.vue";
 
 describe("ShButton", () => {
-  it("renders as button on mount", () => {
-    const wrapper = mount(ShButton);
+  it("renders a named native button by default", () => {
+    const wrapper = mount(ShButton, { slots: { default: "Save" } });
     expect(wrapper.element.tagName).toBe("BUTTON");
+    expect(wrapper.attributes("type")).toBe("button");
+    expect(wrapper.attributes("role")).toBeUndefined();
   });
 
-  it("renders as anchor when props 'as: a' are passed", () => {
-    //NOTE - href necessary when passing "as: a" props (else dev warning fires)
+  it("renders navigation as a native link without button semantics", () => {
     const wrapper = mount(ShButton, {
-      props: { as: "a" },
-      attrs: { href: "#" },
+      props: { as: "a", href: "/settings" },
+      slots: { default: "Settings" },
     });
     expect(wrapper.element.tagName).toBe("A");
+    expect(wrapper.attributes("href")).toBe("/settings");
+    expect(wrapper.attributes("role")).toBeUndefined();
   });
 
-  it("emits 'click' when enabled and emit length === 1", async () => {
-    const wrapper = mount(ShButton);
-    const btn = wrapper.find("button");
-    await btn.trigger("click");
-    const event = wrapper.emitted("click");
-    if (!event) throw new Error("event does not exist/is falsy");
-    expect(event.length).toBe(1);
+  it("emits click when enabled", async () => {
+    const wrapper = mount(ShButton, { slots: { default: "Save" } });
+    await wrapper.trigger("click");
+    expect(wrapper.emitted("click")).toHaveLength(1);
   });
 
-  it("does not emit 'click' when props: disabled = true", async () => {
-    const wrapper = mount(ShButton, { props: { disabled: true } });
-    const btn = wrapper.find("button");
-    await btn.trigger("click");
-    expect(wrapper.emitted("click")).toBeFalsy();
-  });
-
-  it("anchor emits 'click' on 'enter' keydown event", async () => {
+  it("prevents disabled link activation and removes href", async () => {
     const wrapper = mount(ShButton, {
-      props: { as: "a" },
-      attrs: { href: "#" },
+      props: { as: "a", href: "/settings", disabled: true },
+      slots: { default: "Settings" },
     });
-    const anchor = wrapper.find("a");
-    await anchor.trigger("keydown", { key: "Enter" });
-    expect(wrapper.emitted("click")).toBeTruthy();
+    await wrapper.trigger("click");
+    expect(wrapper.attributes("href")).toBeUndefined();
+    expect(wrapper.attributes("aria-disabled")).toBe("true");
+    expect(wrapper.attributes("tabindex")).toBe("-1");
+    expect(wrapper.emitted("click")).toBeUndefined();
+  });
+
+  it("forwards attributes to the interactive element", () => {
+    const wrapper = mount(ShButton, {
+      attrs: { "aria-describedby": "save-help" },
+      slots: { default: "Save" },
+    });
+    expect(wrapper.attributes("aria-describedby")).toBe("save-help");
   });
 });
