@@ -7,7 +7,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "shims-vue.d.ts", "plugin.ts"],
+    ignores: ["dist/**", "node_modules/**", "reference/**", "shims-vue.d.ts"],
   },
   js.configs.recommended,
   ...vuePlugin.configs["flat/recommended"],
@@ -38,6 +38,7 @@ export default [
       ...tsPlugin.configs.recommended.rules,
       "no-undef": "off",
       "vue/multi-word-component-names": "off",
+      "vue/require-default-prop": "off",
     },
   },
   eslintConfigPrettier,
