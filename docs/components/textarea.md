@@ -2,6 +2,8 @@
 
 An accessible textarea component with label, description, error, resize, and focus support.
 
+`ShTextarea` can also consume label, description, error, required, disabled, and invalid state from `ShField`. Consumer attributes are forwarded to the native `<textarea>`, and all generated and consumer `aria-describedby` IDs are merged.
+
 ---
 
 ## Usage, Options, and Requirements:

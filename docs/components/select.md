@@ -2,6 +2,8 @@
 
 An accessible select component with label, description, error, and focus support.
 
+`ShSelect` can also consume label, description, error, required, disabled, and invalid state from `ShField`. Consumer attributes are forwarded to the native `<select>`, and all generated and consumer `aria-describedby` IDs are merged.
+
 ---
 
 ## Usage, Options, and Requirements:

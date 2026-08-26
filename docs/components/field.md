@@ -1,95 +1,42 @@
 # ShField
 
-A field wrapper component intended for form labeling, description, and error wiring.
-
----
-
-## Usage, Options, and Requirements:
-
-### Current Status
+`ShField` centralizes the visible label, description, error, and shared form-control state. Compatible ShoeHorn controls consume its context automatically.
 
 ```vue
 <ShField
-  label="Email"
-  for="email"
-  description="We will never share your email."
-  error="Email is required"
-/>
+  id="email"
+  label="Email address"
+  description="Used for account recovery"
+  :error="emailError"
+  required
+>
+  <ShInput v-model="email" name="email" type="email" autocomplete="email" />
+</ShField>
 ```
 
-#### Acts as:
+The generated relationships are instance-safe: the label targets `email`, descriptions use `email-description`, and errors use `email-error`. Child controls merge these with consumer-provided `aria-describedby` IDs.
 
-A placeholder setup component that currently does not render any markup.
+## Props
 
-#### Optional Attributes:
+| Prop          | Type      | Default   | Purpose                               |
+| ------------- | --------- | --------- | ------------------------------------- |
+| `id`          | `string`  | generated | Native child control ID               |
+| `label`       | `string`  | —         | Visible field label                   |
+| `description` | `string`  | —         | Persistent guidance                   |
+| `error`       | `string`  | —         | Validation feedback and invalid state |
+| `required`    | `boolean` | `false`   | Shared required state                 |
+| `optional`    | `boolean` | `false`   | Visible optional indicator            |
+| `disabled`    | `boolean` | `false`   | Shared disabled state                 |
 
-##### Label
+## Slots
 
-`string`
+- `default`: The control. Scoped values expose the generated attributes for custom controls.
+- `label`, `description`, `error`: Custom content for each field region.
 
-- Intended to provide the field label text.
-- Recommended for accessibility.
-
-##### For
-
-`string`
-
-- Intended to associate the field with a form control ID.
-- Also used internally to derive description and error IDs.
-
-##### Error
-
-`string`
-
-- Intended to describe validation problems for the field.
-
-##### Description
-
-`string`
-
-- Intended to provide helper text for the field.
-
-##### Required
-
-`true` | `false`
-
-- Intended to mark the field as required.
-
-##### Optional
-
-`true` | `false`
-
-- Intended to mark the field as optional.
-
-#### Requirements:
-
-- Provide either a `label` prop or label slot for accessibility.
-- Do not set both `required` and `optional` at the same time.
-
----
-
-### Rule of Thumb:
-
-- Treat ShField as work-in-progress until it renders actual markup.
-- Prefer `ShLabel`, `ShInput`, `ShSelect`, and `ShTextarea` directly for now.
-
----
-
-## Styling Hooks
-
-ShField does not currently render DOM output, so there are no styling hooks yet.
-
----
-
-## Dev-time Warnings
-
-ShField warns during development if:
-
-- No `label` prop and no `label` slot are provided.
-- Both `required` and `optional` are set at the same time.
-
-Example:
-
+```vue
+<ShField id="custom" label="Custom value" v-slot="control">
+  <input v-bind="control" />
+</ShField>
 ```
-[ShField] Field has both `required` and `optional` props set. Only one should be used.
-```
+
+Do not set `required` and `optional` together. Keep error text specific and corrective. For a form-wide failure, applications should additionally provide an error summary and focus it intentionally.

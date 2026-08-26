@@ -1,34 +1,47 @@
 # ShTooltip
 
-Tooltip documentation placeholder.
+`ShTooltip` supplies a short, non-interactive text description that appears on keyboard focus or pointer hover. Do not use it for essential information, validation errors, or interactive content; use visible text, a description, dialog, or popover instead.
 
----
+## Usage
 
-## Usage, Options, and Requirements:
+The scoped slot returns `triggerProps`. Bind them to the actual focusable trigger so `aria-describedby` and event handlers reach the correct element.
 
-### Current Status
+```vue
+<script setup lang="ts">
+import { ShTooltip } from "shoehorn-ui";
+</script>
 
-ShTooltip is not implemented yet.
+<template>
+  <ShTooltip text="Download report" v-slot="{ triggerProps }">
+    <button v-bind="triggerProps" type="button" aria-label="Download report">
+      <DownloadIcon aria-hidden="true" />
+    </button>
+  </ShTooltip>
+</template>
+```
 
-- The `src/components/Tooltip/` folder exists.
-- There is currently no Vue component file in that folder.
-- No public props, events, or styling hooks are available yet.
+## Props
 
----
+| Prop         | Type                             | Default  | Purpose                               |
+| ------------ | -------------------------------- | -------- | ------------------------------------- |
+| `text`       | `string`                         | required | Plain tooltip text                    |
+| `placement`  | `top \| right \| bottom \| left` | `top`    | Preferred visual placement            |
+| `openDelay`  | `number`                         | `300`    | Delay before showing, in milliseconds |
+| `closeDelay` | `number`                         | `100`    | Delay before hiding, in milliseconds  |
 
-### Rule of Thumb:
+## Keyboard behavior
 
-- Do not document or rely on ShTooltip in consuming apps yet.
-- Wait until the component implementation is added before depending on its API.
+| Key             | Behavior                                                 |
+| --------------- | -------------------------------------------------------- |
+| Tab / Shift+Tab | Native focus navigation shows or hides the tooltip       |
+| Escape          | Dismisses the tooltip while leaving focus on the trigger |
 
----
+The tooltip itself never receives focus and must not contain links, buttons, or form controls. The trigger must remain understandable without depending exclusively on hover.
 
-## Styling Hooks
+## Styling hooks
 
-ShTooltip does not currently expose styling hooks because no component is implemented yet.
-
----
-
-## Dev-time Warnings
-
-ShTooltip does not currently emit dev-time warnings because no component is implemented yet.
+- `.sh-tooltip`
+- `.sh-tooltip__content`
+- `[data-placement]`
+- `--sh-tooltip-text`
+- `--sh-tooltip-background`

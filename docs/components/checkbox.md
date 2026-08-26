@@ -1,5 +1,7 @@
 # ShCheckbox
 
+`ShCheckbox` can consume label, description, required, disabled, and invalid state from `ShField`. It preserves the native checkbox's Space-key, form, validation, and reset behavior; `indeterminate` synchronizes the DOM property and exposes `aria-checked="mixed"`.
+
 An accessible checkbox component with checked, indeterminate, and focus states.
 
 ---

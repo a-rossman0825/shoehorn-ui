@@ -1,207 +1,34 @@
 # ShDialog
 
-An accessible modal dialog component with focus trapping and overlay dismissal controls.
-
----
-
-## Usage, Options, and Requirements:
-
-### Basic Dialog
+`ShDialog` uses the native `<dialog>` element for modal focus containment, background inertness, and Escape behavior.
 
 ```vue
+<ShButton @click="open = true">Delete account</ShButton>
 <ShDialog
-  v-model:open="isOpen"
-  title="Delete project"
+  v-model:open="open"
+  title="Delete account"
   description="This action cannot be undone."
 >
-  <p>Are you sure you want to delete this project?</p>
-
+  <p>Confirm permanent deletion.</p>
   <template #footer>
-    <ShButton variant="ghost" @click="isOpen = false">Cancel</ShButton>
-    <ShButton variant="primary" @click="confirmDelete">Delete</ShButton>
+    <ShButton @click="open = false">Cancel</ShButton>
+    <ShButton variant="primary" @click="deleteAccount">Delete</ShButton>
   </template>
 </ShDialog>
 ```
 
-#### Acts as:
+## Props
 
-A teleported dialog overlay rendered into `body`, with focus moved inside on open and restored on close.
+| Prop                  | Type      | Default                 | Purpose                                           |
+| --------------------- | --------- | ----------------------- | ------------------------------------------------- |
+| `open`                | `boolean` | `false`                 | Controlled visibility                             |
+| `modal`               | `boolean` | `true`                  | Uses `showModal()` rather than non-modal `show()` |
+| `closeOnEsc`          | `boolean` | `true`                  | Allows native Escape cancellation                 |
+| `closeOnOverlayClick` | `boolean` | `true`                  | Dismisses pointer interaction on the backdrop     |
+| `title`               | `string`  | —                       | Visible accessible name                           |
+| `description`         | `string`  | —                       | Supporting description                            |
+| `initialFocus`        | `string`  | first focusable control | CSS selector within the dialog                    |
 
-#### Optional Attributes:
+The component emits `update:open(false)` and `close`; the parent remains responsible for applying controlled state. A visible close button is always included. `focus()` and `close()` are exposed.
 
-##### Open
-
-`true` | `false`
-
-- Controls whether the dialog is visible.
-- Defaults to `false` if not specified.
-- Use with `v-model:open`.
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" title="Edit profile" />
-```
-
-##### Modal
-
-`true` | `false`
-
-- Controls the `aria-modal` value.
-- Defaults to `true` if not specified.
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" :modal="false" title="Inspector" />
-```
-
-##### CloseOnEsc
-
-`true` | `false`
-
-- Closes the dialog when the Escape key is pressed.
-- Defaults to `true` if not specified.
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" :closeOnEsc="false" title="Critical step" />
-```
-
-##### CloseOnOverlayClick
-
-`true` | `false`
-
-- Closes the dialog when the overlay background is clicked.
-- Defaults to `true` if not specified.
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" :closeOnOverlayClick="false" title="Wizard" />
-```
-
-##### Title
-
-`string`
-
-- Visible dialog title.
-- Strongly recommended for accessibility.
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" title="Invite team member" />
-```
-
-##### Description
-
-`string`
-
-- Optional supporting text linked with `aria-describedby`.
-
-Usage:
-
-```vue
-<ShDialog
-  v-model:open="isOpen"
-  title="Delete file"
-  description="Deleting this file removes it permanently."
-/>
-```
-
-#### Requirements:
-
-- Should include a `title` for accessible naming.
-- Provide meaningful content in the default slot.
-- Use the `footer` slot when actions belong at the bottom of the dialog.
-
----
-
-### Non-dismissible Dialog
-
-```vue
-<ShDialog
-  v-model:open="showSetup"
-  title="Complete setup"
-  :closeOnEsc="false"
-  :closeOnOverlayClick="false"
->
-  <p>Please complete the required steps before continuing.</p>
-</ShDialog>
-```
-
-- Prevents accidental dismissal.
-- Useful for multi-step flows or mandatory actions.
-
----
-
-### Rule of Thumb:
-
-- Always provide a clear `title`.
-- Keep dialog content focused on a single task.
-- Disable overlay/Escape dismissal only when truly necessary.
-
----
-
-## Events
-
-| **Event**     | **Payload** | **Description**                              |
-| ------------- | ----------- | -------------------------------------------- |
-| `update:open` | `boolean`   | Emitted when the dialog should open or close |
-| `close`       | none        | Emitted when the dialog closes               |
-
-Usage:
-
-```vue
-<ShDialog v-model:open="isOpen" title="Example" @close="handleClose" />
-```
-
----
-
-## Styling Hooks
-
-### Classes
-
-- `.sh-dialog-overlay` — Applied to the overlay element.
-- `.sh-dialog` — Applied to the dialog container.
-- `.sh-dialog__header` — Applied to the header row.
-- `.sh-dialog__title` — Applied to the title element.
-- `.sh-dialog__description` — Applied to the description element.
-- `.sh-dialog__content` — Applied to the main content area.
-- `.sh-dialog__footer` — Applied to the footer slot wrapper.
-
-### Transition Hooks
-
-- `sh-dialog` — Transition name used by the built-in `<Transition>` wrapper.
-
-Example:
-
-```scss
-.sh-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.sh-dialog {
-  max-width: 32rem;
-  margin: 10vh auto;
-  background: white;
-}
-```
-
----
-
-## Dev-time Warnings
-
-ShDialog warns during development if:
-
-- No `title` prop is provided.
-
-Example:
-
-```
-[ShDialog] Dialog has no title. Provide the `title` prop for proper labeling.
-```
+Do not disable Escape or the close button without a critical workflow reason. Initial focus should usually target the least destructive action or static introductory content for long dialogs. Nested modal behavior must be tested in the consuming application.
