@@ -1,52 +1,48 @@
 <script setup lang="ts">
-import { computed } from "vue";
-
-interface AccordionItem {
-  id: string;
-  title: string;
-  disabled?: boolean;
-}
+import { computed, useId, watchEffect } from "vue";
+import type { AccordionItem } from "./types";
 
 const props = withDefaults(
   defineProps<{
     modelValue?: string[];
     items?: AccordionItem[];
     multiple?: boolean;
+    headingLevel?: 2 | 3 | 4 | 5 | 6;
+    region?: boolean;
   }>(),
   {
     modelValue: () => [],
+    items: () => [],
     multiple: false,
+    headingLevel: 3,
+    region: true,
   },
 );
-
-const emit = defineEmits<{
-  "update:modelValue": [value: string[]];
-}>();
-
-const openItems = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
-
-function toggle(itemId: string, disabled?: boolean) {
-  if (disabled) return;
-
-  const itemIsOpen = openItems.value.includes(itemId);
-
-  if (props.multiple) {
-    if (itemIsOpen) {
-      openItems.value = openItems.value.filter((id) => id !== itemId);
-    } else {
-      openItems.value = [...openItems.value, itemId];
-    }
-    return;
-  }
-
-  openItems.value = itemIsOpen ? [] : [itemId];
+const emit = defineEmits<{ "update:modelValue": [value: string[]] }>();
+const instanceId = useId();
+const headingTag = computed(() => `h${props.headingLevel}`);
+const triggerId = (id: string) => `sh-accordion-${instanceId}-trigger-${id}`;
+const panelId = (id: string) => `sh-accordion-${instanceId}-panel-${id}`;
+const isOpen = (id: string) => props.modelValue.includes(id);
+function toggle(item: AccordionItem) {
+  if (item.disabled) return;
+  if (props.multiple)
+    emit(
+      "update:modelValue",
+      isOpen(item.id)
+        ? props.modelValue.filter((id) => id !== item.id)
+        : [...props.modelValue, item.id],
+    );
+  else emit("update:modelValue", isOpen(item.id) ? [] : [item.id]);
 }
-
-function isOpen(itemId: string) {
-  return openItems.value.includes(itemId);
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
+    const ids = props.items.map((item) => item.id);
+    if (new Set(ids).size !== ids.length)
+      console.warn(
+        "[ShAccordion] Item IDs must be unique within an accordion.",
+      );
+  });
 }
 </script>
 
@@ -58,32 +54,30 @@ function isOpen(itemId: string) {
       class="sh-accordion__item"
       :data-state="isOpen(item.id) ? 'open' : 'closed'"
     >
-      <h3 class="sh-accordion__header">
+      <component :is="headingTag" class="sh-accordion__header">
         <button
-          :id="`${item.id}-trigger`"
+          :id="triggerId(item.id)"
+          type="button"
           class="sh-accordion__trigger"
           :aria-expanded="isOpen(item.id)"
-          :aria-controls="`${item.id}-content`"
+          :aria-controls="panelId(item.id)"
           :disabled="item.disabled"
-          @click="toggle(item.id, item.disabled)"
+          @click="toggle(item)"
         >
-          <span>{{ item.title }}</span>
-          <span class="sh-accordion__icon" aria-hidden="true">
-            {{ isOpen(item.id) ? "−" : "+" }}
-          </span>
+          <span>{{ item.title }}</span
+          ><span class="sh-accordion__icon" aria-hidden="true">{{
+            isOpen(item.id) ? "−" : "+"
+          }}</span>
         </button>
-      </h3>
-
+      </component>
       <div
-        :id="`${item.id}-content`"
-        role="region"
+        :id="panelId(item.id)"
+        :role="region ? 'region' : undefined"
         class="sh-accordion__content"
-        :aria-labelledby="`${item.id}-trigger`"
+        :aria-labelledby="region ? triggerId(item.id) : undefined"
         :hidden="!isOpen(item.id)"
       >
-        <div class="sh-accordion__body">
-          <slot :name="item.id" />
-        </div>
+        <div class="sh-accordion__body"><slot :name="item.id" /></div>
       </div>
     </div>
   </div>

@@ -1,78 +1,85 @@
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
-
-interface Tab {
-  id: string;
-  label: string;
-  disabled?: boolean;
-}
+import { computed, nextTick, ref, useId, watchEffect } from "vue";
+import type { TabItem } from "./types";
 
 const props = withDefaults(
   defineProps<{
     modelValue?: string;
-    tabs?: Tab[];
+    tabs?: TabItem[];
     orientation?: "horizontal" | "vertical";
+    activation?: "automatic" | "manual";
+    label?: string;
   }>(),
   {
+    tabs: () => [],
     orientation: "horizontal",
+    activation: "automatic",
+    label: "Tabs",
   },
 );
-
 const emit = defineEmits<{
   "update:modelValue": [value: string];
   change: [value: string];
 }>();
+const instanceId = useId();
+const tabRefs = ref<HTMLButtonElement[]>([]);
+const enabledTabs = computed(() => props.tabs.filter((tab) => !tab.disabled));
+const fallbackTab = computed(() => enabledTabs.value[0]?.id ?? "");
+const activeTab = computed(() =>
+  enabledTabs.value.some((tab) => tab.id === props.modelValue)
+    ? props.modelValue!
+    : fallbackTab.value,
+);
+const focusedTab = ref("");
+const tabId = (id: string) => `sh-tabs-${instanceId}-tab-${id}`;
+const panelId = (id: string) => `sh-tabs-${instanceId}-panel-${id}`;
 
-const activeTab = computed({
-  get: () => props.modelValue || props.tabs?.[0]?.id || "",
-  set: (value) => {
-    emit("update:modelValue", value);
-    emit("change", value);
-  },
-});
-
-function selectTab(tabId: string, disabled?: boolean) {
-  if (!disabled) {
-    activeTab.value = tabId;
-  }
+function selectTab(id: string) {
+  const tab = props.tabs.find((item) => item.id === id);
+  if (!tab || tab.disabled || id === props.modelValue) return;
+  emit("update:modelValue", id);
+  emit("change", id);
 }
-
-function onKeydown(event: KeyboardEvent) {
-  if (!props.tabs) return;
-
-  const enabledTabs = props.tabs.filter((t) => !t.disabled);
-  const currentIndex = enabledTabs.findIndex((t) => t.id === activeTab.value);
-
-  let nextIndex = currentIndex;
-
+async function moveFocus(id: string) {
+  focusedTab.value = id;
+  await nextTick();
+  tabRefs.value.find((element) => element.id === tabId(id))?.focus();
+}
+function handleKeydown(event: KeyboardEvent, currentId: string) {
+  const items = enabledTabs.value;
+  if (!items.length) return;
+  const current = Math.max(
+    0,
+    items.findIndex((tab) => tab.id === currentId),
+  );
+  let next: number;
+  const forward =
+    props.orientation === "horizontal" ? "ArrowRight" : "ArrowDown";
+  const backward = props.orientation === "horizontal" ? "ArrowLeft" : "ArrowUp";
+  if (event.key === forward) next = (current + 1) % items.length;
+  else if (event.key === backward)
+    next = current === 0 ? items.length - 1 : current - 1;
+  else if (event.key === "Home") next = 0;
+  else if (event.key === "End") next = items.length - 1;
+  else if (
+    (event.key === "Enter" || event.key === " ") &&
+    props.activation === "manual"
+  ) {
+    event.preventDefault();
+    selectTab(currentId);
+    return;
+  } else return;
+  event.preventDefault();
+  const id = items[next].id;
+  void moveFocus(id);
+  if (props.activation === "automatic") selectTab(id);
+}
+watchEffect(() => {
   if (
-    (event.key === "ArrowRight" && props.orientation === "horizontal") ||
-    (event.key === "ArrowDown" && props.orientation === "vertical")
-  ) {
-    event.preventDefault();
-    nextIndex = (currentIndex + 1) % enabledTabs.length;
-  } else if (
-    (event.key === "ArrowLeft" && props.orientation === "horizontal") ||
-    (event.key === "ArrowUp" && props.orientation === "vertical")
-  ) {
-    event.preventDefault();
-    nextIndex = currentIndex <= 0 ? enabledTabs.length - 1 : currentIndex - 1;
-  } else if (event.key === "Home") {
-    event.preventDefault();
-    nextIndex = 0;
-  } else if (event.key === "End") {
-    event.preventDefault();
-    nextIndex = enabledTabs.length - 1;
-  }
-
-  if (nextIndex !== currentIndex) {
-    activeTab.value = enabledTabs[nextIndex].id;
-  }
-}
-
-provide("tabs", {
-  activeTab,
-  selectTab,
+    !focusedTab.value ||
+    !enabledTabs.value.some((tab) => tab.id === focusedTab.value)
+  )
+    focusedTab.value = activeTab.value;
 });
 </script>
 
@@ -81,35 +88,38 @@ provide("tabs", {
     <div
       role="tablist"
       class="sh-tabs__list"
+      :aria-label="label"
       :aria-orientation="orientation"
       :data-orientation="orientation"
     >
       <button
-        v-for="(tab, index) in tabs"
+        v-for="tab in tabs"
+        :id="tabId(tab.id)"
         :key="tab.id"
+        ref="tabRefs"
+        type="button"
         role="tab"
         class="sh-tabs__tab"
         :aria-selected="activeTab === tab.id"
-        :aria-controls="`${tab.id}-panel`"
-        :tabindex="activeTab === tab.id ? 0 : -1"
+        :aria-controls="panelId(tab.id)"
+        :tabindex="focusedTab === tab.id ? 0 : -1"
         :disabled="tab.disabled"
         :data-state="activeTab === tab.id ? 'active' : 'inactive'"
-        @click="selectTab(tab.id, tab.disabled)"
-        @keydown="onKeydown($event)"
+        @click="selectTab(tab.id)"
+        @focus="focusedTab = tab.id"
+        @keydown="handleKeydown($event, tab.id)"
       >
         {{ tab.label }}
       </button>
     </div>
-
     <div
       v-for="tab in tabs"
-      :id="`${tab.id}-panel`"
+      v-show="activeTab === tab.id"
+      :id="panelId(tab.id)"
       :key="`${tab.id}-panel`"
       role="tabpanel"
       class="sh-tabs__panel"
-      :aria-labelledby="tab.id"
-      :hidden="activeTab !== tab.id"
-      :tabindex="0"
+      :aria-labelledby="tabId(tab.id)"
     >
       <slot :name="tab.id" />
     </div>

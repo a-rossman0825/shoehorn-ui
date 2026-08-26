@@ -4,10 +4,26 @@
   width: 100%;
 }
 
+.sh-combobox__label {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
 .sh-combobox__wrapper {
   position: relative;
   display: flex;
   align-items: center;
+}
+
+.sh-combobox__description,
+.sh-combobox__error {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+}
+
+.sh-combobox__error {
+  color: var(--color-error, #b91c1c);
 }
 
 .sh-combobox__input {

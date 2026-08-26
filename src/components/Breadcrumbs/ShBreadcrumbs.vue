@@ -1,66 +1,59 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
-
-interface BreadcrumbItem {
-  label: string;
-  href?: string;
-  current?: boolean;
-}
+import { computed, watchEffect } from "vue";
+import type { BreadcrumbItem } from "./types";
 
 const props = withDefaults(
   defineProps<{
     items?: BreadcrumbItem[];
     separator?: string;
+    label?: string;
   }>(),
-  {
-    separator: "/",
-  },
+  { items: () => [], separator: "/", label: "Breadcrumb" },
 );
-
-const breadcrumbItems = computed(() => props.items ?? []);
-
-onMounted(() => {
-  if (process.env.NODE_ENV !== "production") {
-    if (!props.items || props.items.length === 0) {
+const normalizedItems = computed(() =>
+  props.items.map((item, index) => ({
+    ...item,
+    current: item.current ?? index === props.items.length - 1,
+  })),
+);
+if (process.env.NODE_ENV !== "production") {
+  watchEffect(() => {
+    if (!props.items.length)
+      console.warn("[ShBreadcrumbs] Provide at least one breadcrumb item.");
+    if (normalizedItems.value.filter((item) => item.current).length !== 1)
       console.warn(
-        "[ShBreadcrumbs] Breadcrumbs has no items. " +
-          "Provide the `items` prop with at least one breadcrumb.",
+        "[ShBreadcrumbs] Exactly one breadcrumb item should be current.",
       );
-    }
-  }
-});
+  });
+}
 </script>
 
 <template>
-  <nav aria-label="Breadcrumb" class="sh-breadcrumbs">
+  <nav :aria-label="label" class="sh-breadcrumbs">
     <ol class="sh-breadcrumbs__list">
       <li
-        v-for="(item, index) in breadcrumbItems"
-        :key="index"
+        v-for="(item, index) in normalizedItems"
+        :key="item.id ?? `${item.label}-${index}`"
         class="sh-breadcrumbs__item"
       >
         <a
           v-if="item.href && !item.current"
           :href="item.href"
           class="sh-breadcrumbs__link"
+          >{{ item.label }}</a
         >
-          {{ item.label }}
-        </a>
         <span
           v-else
           class="sh-breadcrumbs__current"
           :aria-current="item.current ? 'page' : undefined"
+          >{{ item.label }}</span
         >
-          {{ item.label }}
-        </span>
-
         <span
-          v-if="index < breadcrumbItems.length - 1"
+          v-if="index < normalizedItems.length - 1"
           class="sh-breadcrumbs__separator"
           aria-hidden="true"
+          >{{ separator }}</span
         >
-          {{ separator }}
-        </span>
       </li>
     </ol>
   </nav>

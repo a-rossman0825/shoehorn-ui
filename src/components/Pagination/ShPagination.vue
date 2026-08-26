@@ -8,11 +8,13 @@ const props = withDefaults(
     perPage?: number;
     showFirstLast?: boolean;
     maxVisible?: number;
+    label?: string;
   }>(),
   {
     perPage: 10,
     showFirstLast: true,
     maxVisible: 7,
+    label: "Pagination",
   },
 );
 
@@ -20,7 +22,9 @@ const emit = defineEmits<{
   "update:modelValue": [value: number];
 }>();
 
-const totalPages = computed(() => Math.ceil(props.total / props.perPage));
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(props.total / props.perPage)),
+);
 
 const pages = computed(() => {
   const current = props.modelValue;
@@ -72,7 +76,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav aria-label="Pagination" class="sh-pagination">
+  <nav :aria-label="label" class="sh-pagination">
     <ul class="sh-pagination__list">
       <!-- NOTE: jump to first page -->
       <li v-if="showFirstLast" class="sh-pagination__item">
