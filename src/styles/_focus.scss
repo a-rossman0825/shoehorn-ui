@@ -1,4 +1,12 @@
 @mixin sh-focus-ring {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
+  outline: 3px solid var(--sh-focus-color, #1d4ed8);
+  outline-offset: 3px;
+}
+
+@mixin sh-reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

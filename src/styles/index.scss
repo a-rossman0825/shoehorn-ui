@@ -12,11 +12,7 @@
 @use "../components/Textarea/textarea";
 @use "../components/Label/label";
 @use "../components/Badge/badge";
-@use "../components/Card/card";
-@use "../components/Progress/progress";
-@use "../components/Spinner/spinner";
 @use "../components/Dialog/dialog";
-@use "../components/Tooltip/tooltip";
 @use "../components/Tabs/tabs";
 @use "../components/Accordion/accordion";
 @use "../components/Breadcrumbs/breadcrumbs";
@@ -24,3 +20,8 @@
 @use "../components/Form/form";
 @use "../components/Field/field";
 @use "../components/Combobox/combobox";
+@use "../components/Alert/alert";
+@use "../components/Progress/progress";
+@use "../components/Spinner/spinner";
+@use "../components/Tooltip/tooltip";
+@use "../components/VisuallyHidden/visually-hidden";

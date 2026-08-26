@@ -1,10 +1,4 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.sr-only {
+.sh-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -14,4 +8,36 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+@media (forced-colors: active) {
+  :where(
+    .sh-button,
+    .sh-input__control,
+    .sh-checkbox__input,
+    .sh-select__control,
+    .sh-switch__control,
+    .sh-textarea__control,
+    .sh-tabs__tab,
+    .sh-accordion__trigger,
+    .sh-pagination__button,
+    .sh-combobox__input,
+    .sh-combobox__option
+  ) {
+    forced-color-adjust: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(
+    .sh-accordion__content,
+    .sh-combobox__input,
+    .sh-combobox__icon,
+    .sh-combobox__option,
+    .sh-pagination__button,
+    .sh-switch__control,
+    .sh-switch__thumb
+  ) {
+    transition-duration: 0.01ms !important;
+  }
 }
